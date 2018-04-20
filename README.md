@@ -8,15 +8,15 @@ Commands:
   latest-ami       Updates the AMI name of Custom::AMI resources...
 ```
 
+# container-image - Updates the Docker image of ECS Container Definitions.
 
-# Updates the Docker image of ECS Container Definitions.
-
-aws-cfn-update container-image will update any container definition 
+will update any container definition 
 where the base image name matches the specified image name 
-excluding the tag.
-
-For example, an image name of `mvanholsteijn/paas-monitor:0.6.0` will
-update:
+excluding the tag. For example, the command:
+```
+aws-cfn-update container-image --image mvanholsteijn/paas-monitor:0.6.0
+```
+will update:
 
 ```
   Type: AWS::ECS::TaskDefinition
@@ -38,13 +38,17 @@ to::
 
 
 
-# Updates the AMI name of Custom::AMI resources
+# latest-ami - Updates the AMI name of Custom::AMI resources
 
-`aws-cfn-update` `latest-ami` will update the AMI name of 
-Custom::AMI resources to the latest version.  
+will update the AMI name of Custom::AMI resources to the latest version.  
 
-For example, an ami-name-pattern of `amzn-ami-*ecs-optimized` will update
-the following resource definition from::
+For example, the command: 
+
+```
+aws-cfn-update latest-ami --ami-name-pattern 'amzn-ami-*ecs-optimized'
+```
+
+will update the following resource definition from::
 
 ```
    Type: Custom::AMI
