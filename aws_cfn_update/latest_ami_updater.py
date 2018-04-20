@@ -9,10 +9,11 @@ from .cfn_updater import CfnUpdater
 
 class AMIUpdater(CfnUpdater):
     """
-    Updates the AMI name filter of a Custom::AMI resource to the latest
-    version. With an ami-name-pattern of `amzn-ami-*ecs-optimized` 
-    it will update the following resource definition from:
+    Updates the AMI name of Custom::AMI resources to the latest version. 
+    With an ami-name-pattern of `amzn-ami-*ecs-optimized` it will update
+    the following resource definition from:
 
+\b
          Type: Custom::AMI
          Properties:
            Filters:
@@ -20,6 +21,7 @@ class AMIUpdater(CfnUpdater):
 
     to:
 
+\b
          Type: Custom::AMI
          Properties:
            Filters:

@@ -2,9 +2,9 @@ import sys
 from .cfn_updater import CfnUpdater
 
 
-class TaskImageUpdater(CfnUpdater):
+class ContainerImageUpdater(CfnUpdater):
     """
-    Updates the Image of ECS Container Definitions.
+    Updates the Docker image of ECS Container Definitions.
 
     it will update any container definition where the base image name matches
     the specified image name excluding the tag.
@@ -28,7 +28,7 @@ class TaskImageUpdater(CfnUpdater):
     """
 
     def __init__(self):
-        super(TaskImageUpdater, self).__init__()
+        super(ContainerImageUpdater, self).__init__()
         self._image = []
 
     @property

@@ -4,16 +4,8 @@ from copy import copy
 import click
 
 from aws_cfn_update.latest_ami_updater import AMIUpdater
-from aws_cfn_update.task_image_updater import TaskImageUpdater
+from aws_cfn_update.container_image_updater import ContainerImageUpdater
 
-
-class SpecialEpilog(click.Command):
-
-    def format_epilog(self, ctx, formatter):
-        if self.epilog:
-            formatter.write_paragraph()
-            for line in self.epilog.split('\n'):
-                formatter.write_text(line)
 
 
 @click.group()
@@ -33,16 +25,16 @@ def validate_image(ctx, param, value):
         raise click.BadParameter('"{}" is not a valid docker image specification'.format(value))
 
 
-@cli.command(name='task-image', epilog=TaskImageUpdater.__doc__, cls=SpecialEpilog)
-@click.option('--image', required=True, callback=validate_image, help='to update the task definitions with')
+@cli.command(name='container-image', help=ContainerImageUpdater.__doc__)
+@click.option('--image', required=True, callback=validate_image, help='to update to')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def task_image(ctx, image, path):
-    updater = TaskImageUpdater()
+    updater = ContainerImageUpdater()
     updater.main(image, ctx.obj['dry_run'], ctx.obj['verbose'], list(path))
 
 
-@cli.command(name='latest-ami', epilog=AMIUpdater.__doc__, cls=SpecialEpilog)
+@cli.command(name='latest-ami', help=AMIUpdater.__doc__)
 @click.option('--ami-name-pattern', required=True, help='glob style pattern of the AMI image name to use')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
