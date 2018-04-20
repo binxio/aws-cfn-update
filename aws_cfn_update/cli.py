@@ -8,6 +8,7 @@ from aws_cfn_update.task_image_updater import TaskImageUpdater
 
 
 class SpecialEpilog(click.Command):
+
     def format_epilog(self, ctx, formatter):
         if self.epilog:
             formatter.write_paragraph()

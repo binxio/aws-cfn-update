@@ -26,6 +26,7 @@ class TaskImageUpdater(CfnUpdater):
               Image: mvanholsteijn/paas-monitor:0.6.0
 
     """
+
     def __init__(self):
         super(TaskImageUpdater, self).__init__()
         self._image = []
@@ -83,5 +84,3 @@ class TaskImageUpdater(CfnUpdater):
         self.dry_run = dry_run
         self.verbose = verbose
         self.update(paths)
-
-

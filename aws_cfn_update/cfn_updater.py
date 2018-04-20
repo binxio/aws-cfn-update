@@ -7,7 +7,20 @@ import collections
 
 class CfnUpdater(object):
     """
-    base updater of cloudformation templates.
+    base class for a CloudFormation  update. To implement a specific updater: 
+
+    - inherit this class
+    - override the method update_template()
+    - call the method update(path)
+
+    it will read the template from files with extension .yaml, .yml and .json into 
+    the property `self.template`.
+
+    If the property `self.dirty` is set to True, the template will be written 
+    back to the originating file.
+
+    Please note that formatting and comments may be lost, when using this 
+    updater.
     """
 
     def __init__(self):
@@ -22,10 +35,18 @@ class CfnUpdater(object):
 
     @property
     def filename(self):
+        """
+        current template filename
+        """
         return self._filename
 
     @filename.setter
     def filename(self, filename):
+        """
+        requires `filename` ends with `.json`, `.yaml` or `.yml`.
+        sets `basename`, `template_format` and `_filename` accordingly.
+        clears `dirty` and `templae`
+        """
         self._filename = filename
         parts = os.path.splitext(os.path.basename(filename))
         self.basename = parts[0]
@@ -36,6 +57,9 @@ class CfnUpdater(object):
             raise ValueError('%s has no .json, .yaml or .yml extension.' % filename)
 
     def load(self):
+        """
+        loads `template` from `filename` as dictionary.
+        """
         self.dirty = False
         self.template = None
         with open(self.filename, 'r') as f:
@@ -52,8 +76,8 @@ class CfnUpdater(object):
 
     def write(self):
         """
-        write modified the CloudFormation template. It will retain it's original
-        format (yaml or json) but will loose formatting and comments.
+        write modified content from `template` to `filename`. It will retain it's original
+        format (yaml or json) but loose original formatting and comments.
         """
         if not self.dirty and self.verbose:
             sys.stderr.write('INFO: no changes in {}\n'.format(self.filename))
