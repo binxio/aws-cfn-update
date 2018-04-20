@@ -7,7 +7,7 @@ from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.task_image_updater import TaskImageUpdater
 
 
-class SpecialEpilog(click.Group):
+class SpecialEpilog(click.Command):
     def format_epilog(self, ctx, formatter):
         if self.epilog:
             formatter.write_paragraph()
@@ -38,7 +38,7 @@ def validate_image(ctx, param, value):
 @click.pass_context
 def task_image(ctx, image, path):
     updater = TaskImageUpdater()
-    updater.main(image, ctx.obj['dry_run'], ctx.obj['verbose'], path)
+    updater.main(image, ctx.obj['dry_run'], ctx.obj['verbose'], list(path))
 
 
 @cli.command(name='latest-ami', epilog=AMIUpdater.__doc__, cls=SpecialEpilog)
