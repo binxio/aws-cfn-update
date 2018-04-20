@@ -1,0 +1,26 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "AMI": {
+      "Type": "Custom::AMI",
+      "Properties": {
+        "Filters": {
+          "name": "amzn-ami-2017.09.a-amazon-ecs-optimized"
+        }
+      }
+    },
+    "TaskDefinition": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "Family": "testme",
+        "NetworkMode": "bridge",
+        "ContainerDefinitions": [
+          {
+            "Name": "paas-monitor",
+            "Image": "mvanholsteijn/paas-monitor:latest"
+          }
+        ]
+      }
+    }
+  }
+}
