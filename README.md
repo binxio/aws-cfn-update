@@ -1,6 +1,7 @@
 # aws-cfn-update
 
-Programmatically update CloudFormation templates.
+Programmatically update CloudFormation templates. It will update both .yaml and .json formats of
+a CloudFormation template. Note that formatting and comments may be lost.
 
 Commands:
 ```
