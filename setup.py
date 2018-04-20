@@ -7,7 +7,7 @@ dependencies = ['click', 'boto3', 'cfn-flip']
 
 setup(
     name='aws-cfn-update',
-    version='0.1.0',
+    version="0.0.1",
     url='https://github.com/mvanholsteijn/aws-cfn-update',
     license='BSD',
     author='Mark van Holsteijn',
