@@ -11,6 +11,7 @@ class ContainerImageUpdater(CfnUpdater):
 
     For example, an image name of `mvanholsteijn/paas-monitor:0.6.0` will update:
 
+\b
         Type: AWS::ECS::TaskDefinition
         Properties:
           ContainerDefinitions:
@@ -19,6 +20,7 @@ class ContainerImageUpdater(CfnUpdater):
 
     to:
 
+\b
         Type: AWS::ECS::TaskDefinition
         Properties:
           ContainerDefinitions:
