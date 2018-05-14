@@ -16,9 +16,27 @@ import fnmatch
 import re
 import sys
 
+import json
 import boto3
 
 from .cfn_updater import CfnUpdater
+from .replace_references import replace_references
+
+def split_resource_name(resource_name):
+    m = re.match(r'^(?P<base>.*)v(?P<version>[0-9]+)$', resource_name)
+
+    if m is not None:
+        base = m.group('base')
+        version = int(m.group('version'))
+    else:
+        base = resource_name
+        version = 0
+
+    return base, version
+
+def make_new_resource_name(resource_name):
+    base, version = split_resource_name(resource_name)
+    return '{}v{}'.format(base, version + 1)
 
 
 class AMIUpdater(CfnUpdater):
@@ -39,13 +57,59 @@ class AMIUpdater(CfnUpdater):
          Type: Custom::AMI
          Properties:
            Filters:
-             name: amzn-ami-2017.09.l-amazon-ecs-optimized    
+             name: amzn-ami-2017.09.l-amazon-ecs-optimized
+
+
+    By specifying --add-new-version, a new Custom::AMI will be added
+    to the template with a new name. A suffix `v<version>` is appended
+    to create the new resource. Any reference to the original Custom::AMI
+    resource is replaced. It will change:
+
+\b
+      CustomAMI:
+         Type: Custom::AMI
+         Properties:
+           Filters:
+             name: amzn-ami-2017.09.a-amazon-ecs-optimized
+      CustomAMIv2:
+         Type: Custom::AMI
+         Properties:
+           Filters:
+             name: amzn-ami-2017.09.b-amazon-ecs-optimized
+      Instance:
+         Type: AWS::EC2::Instance
+         Properties:
+            ImageId: !Ref CustomAMIv2
+
+    to:
+
+\b
+      CustomAMI:
+         Type: Custom::AMI
+         Properties:
+           Filters:
+             name: amzn-ami-2017.09.a-amazon-ecs-optimized
+      CustomAMIv2:
+         Type: Custom::AMI
+         Properties:
+           Filters:
+             name: amzn-ami-2017.09.b-amazon-ecs-optimized
+      CustomAMIv3:
+         Type: Custom::AMI
+         Properties:
+           Filters:
+             name: amzn-ami-2017.09.l-amazon-ecs-optimized
+      Instance:
+         Type: AWS::EC2::Instance
+         Properties:
+            ImageId: !Ref CustomAMIv3
     """
 
     def __init__(self):
         super(AMIUpdater, self).__init__()
         self._ami_name_pattern = None
         self.latest_ami_name_pattern = None
+        self.add_new_version = False
 
     @property
     def ami_name_pattern(self):
@@ -75,39 +139,90 @@ class AMIUpdater(CfnUpdater):
         regex = re.compile(fnmatch.translate(self.ami_name_pattern))
         return regex.match(name)
 
-    def all_custom_ami_resources(self, resources):
-        return filter(lambda n: self.is_ami_definition(resources[n]) and self.is_name_filter_match(resources[n]),
-                      resources)
+    def all_custom_ami_resources(self):
+        r = self.resources
+        return filter(lambda n: self.is_ami_definition(r[n]) and self.is_name_filter_match(r[n]), r)
 
     def is_name_filter_match(self, ami):
         if 'Properties' in ami and 'Filters' in ami['Properties'] and 'name' in ami['Properties']['Filters']:
             return self.is_ami_name_pattern_match(ami['Properties']['Filters']['name'])
         return False
 
-    def update_template(self):
+    def custom_ami_resources_partitions(self):
+        partitions = {}
+        ami_resources = self.all_custom_ami_resources()
+        for resource_name in ami_resources:
+            base, _ = split_resource_name(resource_name)
+            if base not in partitions:
+                partitions[base] = {}
+            partitions[base][resource_name] = self.resources[resource_name]
+
+        for base in partitions:
+            yield partitions[base]
+
+    def latest_custom_ami_resource(self, ami_resources):
+        result = None
+        highest_version = -1
+        for resource_name in ami_resources:
+            _, version = split_resource_name(resource_name)
+            if version > highest_version:
+                result = resource_name
+                highest_version = version
+
+        return result
+
+    def ami_requires_update(self, ami):
+        name = ami['Properties']['Filters']['name']
+        return name != self.latest_ami_name_pattern
+
+    def update_ami(self, resource_name, ami):
+        if self.ami_requires_update(ami):
+            ami['Properties']['Filters']['name'] = self.latest_ami_name_pattern
+            sys.stderr.write(
+                'INFO: updating AMI definition "{}" name filter to {} in {}\n'.format(
+                    resource_name, self.latest_ami_name_pattern, self.filename))
+            self.dirty = True
+        else:
+            if self.verbose:
+                sys.stderr.write(
+                    'INFO: AMI definition "{}" name already up to date in {}\n'.format(
+                        resource_name, self.filename))
+
+
+    def update_inplace(self):
         """
         updates the name filter of AMI resource definitions in `self.template`.
         """
-        resources = self.template.get('Resources', {})
-        for resource_name in self.all_custom_ami_resources(resources):
-            ami = resources[resource_name]
-            name = ami['Properties']['Filters']['name']
-            if name != self.latest_ami_name_pattern:
-                ami['Properties']['Filters']['name'] = self.latest_ami_name_pattern
-                sys.stderr.write(
-                    'INFO: updating AMI definition "{}" name filter to {} in {}\n'.format(
-                        resource_name, self.latest_ami_name_pattern, self.filename))
-                self.dirty = True
-            else:
-                if self.verbose:
-                    sys.stderr.write(
-                        'INFO: AMI definition "{}" name already up to date in {}\n'.format(
-                            resource_name, self.filename))
+        for resource_name in self.all_custom_ami_resources():
+            ami = self.resources[resource_name]
+            self.update_ami(resource_name, ami)
 
-    def main(self, ami_name_pattern, dry_run, verbose, path):
+    def add_new_ami_resource(self):
+        """
+        add a new version of the AMI resource definition in `self.template`.
+        """
+        for ami_resources in self.custom_ami_resources_partitions():
+            resource_name = self.latest_custom_ami_resource(ami_resources)
+            if resource_name is not None:
+                ami = json.loads(json.dumps(self.resources[resource_name]))
+                if self.ami_requires_update(ami):
+                    new_resource_name = make_new_resource_name(resource_name)
+                    self.resources[new_resource_name] = ami
+                    self.update_ami(new_resource_name, ami)
+                    for old_resource_name in ami_resources:
+                        replace_references(self.template, old_resource_name, new_resource_name)
+
+    def update_template(self):
+        if self.add_new_version:
+            self.add_new_ami_resource()
+        else:
+            self.update_inplace()
+
+    def main(self, ami_name_pattern, dry_run, verbose, add_new_version, path):
         self.dry_run = dry_run
         self.verbose = verbose
         self.ami_name_pattern = ami_name_pattern
+        self.add_new_version = add_new_version
         if self.latest_ami_name_pattern is None:
             sys.stderr.write('ERROR: image name {} does not resolve to an active AMI \n'.format(self.ami_name_pattern))
             sys.exit(1)

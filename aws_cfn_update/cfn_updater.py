@@ -112,6 +112,10 @@ class CfnUpdater(object):
         """
         pass
 
+    @property
+    def resources(self):
+        return self.template.get('Resources', {})
+
     def update(self, path):
         """
         recursively updates all the cloudformation templates in the specified `path`. `path` may be a file,

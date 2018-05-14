@@ -19,7 +19,9 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=dependencies,
+    setup_requires=['pytest-runner'],
     tests_require=dependencies + ['pytest'],
+    test_suite='tests',
     entry_points={
         'console_scripts': [
             'aws-cfn-update = aws_cfn_update.cli:main',

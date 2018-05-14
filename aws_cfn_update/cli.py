@@ -50,11 +50,12 @@ def task_image(ctx, image, path):
 
 @cli.command(name='latest-ami', help=AMIUpdater.__doc__)
 @click.option('--ami-name-pattern', required=True, help='glob style pattern of the AMI image name to use')
+@click.option('--add-new-version', is_flag=True, default=False, help='of the AMI resource and replace all references')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
-def ami_image_update(ctx, ami_name_pattern, path):
+def ami_image_update(ctx, ami_name_pattern, add_new_version, path):
     updater = AMIUpdater()
-    updater.main(ami_name_pattern, ctx.obj['dry_run'], ctx.obj['verbose'], list(path))
+    updater.main(ami_name_pattern, ctx.obj['dry_run'], ctx.obj['verbose'], add_new_version, list(path))
 
 
 def main():
