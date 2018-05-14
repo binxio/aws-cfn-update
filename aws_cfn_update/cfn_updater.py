@@ -93,8 +93,9 @@ class CfnUpdater(object):
         write modified content from `template` to `filename`. It will retain it's original
         format (yaml or json) but loose original formatting and comments.
         """
-        if not self.dirty and self.verbose:
-            sys.stderr.write('INFO: no changes in {}\n'.format(self.filename))
+        if not self.dirty:
+            if self.verbose:
+                sys.stderr.write('INFO: no changes in {}\n'.format(self.filename))
             return
 
         if self.dry_run:
