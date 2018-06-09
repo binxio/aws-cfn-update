@@ -21,7 +21,6 @@ from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.container_image_updater import ContainerImageUpdater
 
 
-
 @click.group()
 @click.option('--dry-run', is_flag=True, default=False,
               help='do not change anything, just show what is going to happen')

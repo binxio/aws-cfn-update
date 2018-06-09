@@ -22,6 +22,7 @@ import boto3
 from .cfn_updater import CfnUpdater
 from .replace_references import replace_references
 
+
 def split_resource_name(resource_name):
     m = re.match(r'^(?P<base>.*)v(?P<version>[0-9]+)$', resource_name)
 
@@ -33,6 +34,7 @@ def split_resource_name(resource_name):
         version = 0
 
     return base, version
+
 
 def make_new_resource_name(resource_name):
     base, version = split_resource_name(resource_name)
@@ -108,8 +110,8 @@ class AMIUpdater(CfnUpdater):
     def __init__(self):
         super(AMIUpdater, self).__init__()
         self._ami_name_pattern = None
-        self.latest_ami_name_pattern = None
         self.add_new_version = False
+        self.latest_ami_name_pattern = None
 
     @property
     def ami_name_pattern(self):
@@ -118,15 +120,29 @@ class AMIUpdater(CfnUpdater):
     @ami_name_pattern.setter
     def ami_name_pattern(self, name):
         self._ami_name_pattern = name
-        self.load_latest_ami_name_pattern()
 
     @staticmethod
     def is_ami_definition(resource):
         return resource.get('Type', '') == 'Custom::AMI'
 
-    def load_latest_ami_name_pattern(self):
-        response = boto3.client('ec2').describe_images(
-            Filters=[{'Name': 'name', 'Values': [self.ami_name_pattern]}, {'Name': 'state', 'Values': ['available']}])
+    def create_describe_image_request(self, ami):
+        # copy the filters values, except for name and state.
+        properties = ami.get('Properties', {})
+        filters = [{'Name': 'name', 'Values': [self.ami_name_pattern]},
+                   {'Name': 'state', 'Values': ['available']}]
+        for k, v in properties.get('Filters', {}).items():
+            if k not in ['name', 'state']:
+                filters.append({'Name': k, 'Values': v if isinstance(v, list) else [v]})
+
+        # copy the rest of the arguments
+        result = {n: (properties.get(n) if isinstance(properties.get(n), list) else [properties.get(n)])
+                  for n in filter(lambda n: properties.get(n) is not None, ['Owners', 'ImageIds', 'ExecutableUsers'])}
+        result['Filters'] = filters
+        return result
+
+    def load_latest_ami_name_pattern(self, resource):
+        kwargs = self.create_describe_image_request(resource)
+        response = boto3.client('ec2').describe_images(**kwargs)
         images = sorted(response['Images'], key=lambda i: i['CreationDate'])
         self.latest_ami_name_pattern = images[-1]['Name'] if len(images) > 0 else None
         if len(images) > 0:
@@ -160,7 +176,8 @@ class AMIUpdater(CfnUpdater):
         for base in partitions:
             yield partitions[base]
 
-    def latest_custom_ami_resource(self, ami_resources):
+    @staticmethod
+    def latest_custom_ami_resource(ami_resources):
         result = None
         highest_version = -1
         for resource_name in ami_resources:
@@ -173,7 +190,7 @@ class AMIUpdater(CfnUpdater):
 
     def ami_requires_update(self, ami):
         name = ami['Properties']['Filters']['name']
-        return name != self.latest_ami_name_pattern
+        return self.latest_ami_name_pattern is not None and name != self.latest_ami_name_pattern
 
     def update_ami(self, resource_name, ami):
         if self.ami_requires_update(ami):
@@ -188,13 +205,13 @@ class AMIUpdater(CfnUpdater):
                     'INFO: AMI definition "{}" name already up to date in {}\n'.format(
                         resource_name, self.filename))
 
-
     def update_inplace(self):
         """
         updates the name filter of AMI resource definitions in `self.template`.
         """
         for resource_name in self.all_custom_ami_resources():
             ami = self.resources[resource_name]
+            self.load_latest_ami_name_pattern(ami)
             self.update_ami(resource_name, ami)
 
     def add_new_ami_resource(self):
@@ -205,6 +222,7 @@ class AMIUpdater(CfnUpdater):
             resource_name = self.latest_custom_ami_resource(ami_resources)
             if resource_name is not None:
                 ami = json.loads(json.dumps(self.resources[resource_name]))
+                self.load_latest_ami_name_pattern(ami)
                 if self.ami_requires_update(ami):
                     new_resource_name = make_new_resource_name(resource_name)
                     self.resources[new_resource_name] = ami

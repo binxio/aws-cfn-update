@@ -41,7 +41,7 @@ to::
 
 # latest-ami - Updates the AMI name of Custom::AMI resources
 
-will update the AMI name of Custom::AMI resources to the latest version.  
+will update the AMI name of [Custom::AMI](https://github.com/binxio/cfn-ami-provider) resources to the latest version.  
 
 For example, the command: 
 
@@ -56,6 +56,8 @@ will update the following resource definition from::
    Properties:
      Filters:
        name: amzn-ami-2013.09.a-amazon-ecs-optimized
+     Owners:
+       - amazon
 ```
 
 to::
@@ -65,6 +67,8 @@ to::
    Properties:
      Filters:
        name: amzn-ami-2017.09.l-amazon-ecs-optimized
+     Owners:
+       - amazon
 ```
 
 
