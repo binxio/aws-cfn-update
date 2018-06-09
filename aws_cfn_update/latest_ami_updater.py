@@ -52,6 +52,8 @@ class AMIUpdater(CfnUpdater):
          Properties:
            Filters:
              name: amzn-ami-2017.09.a-amazon-ecs-optimized
+           Owners:
+             - amazon
 
     to:
 
@@ -60,6 +62,8 @@ class AMIUpdater(CfnUpdater):
          Properties:
            Filters:
              name: amzn-ami-2017.09.l-amazon-ecs-optimized
+           Owners:
+             - amazon
 
 
     By specifying --add-new-version, a new Custom::AMI will be added
@@ -73,11 +77,15 @@ class AMIUpdater(CfnUpdater):
          Properties:
            Filters:
              name: amzn-ami-2017.09.a-amazon-ecs-optimized
-      CustomAMIv2:
+           Owners:
+             - amazon
+      CustomAMIv2:`
          Type: Custom::AMI
          Properties:
            Filters:
              name: amzn-ami-2017.09.b-amazon-ecs-optimized
+           Owners:
+             - amazon
       Instance:
          Type: AWS::EC2::Instance
          Properties:
@@ -91,16 +99,22 @@ class AMIUpdater(CfnUpdater):
          Properties:
            Filters:
              name: amzn-ami-2017.09.a-amazon-ecs-optimized
+           Owners:
+             - amazon
       CustomAMIv2:
          Type: Custom::AMI
          Properties:
            Filters:
              name: amzn-ami-2017.09.b-amazon-ecs-optimized
+           Owners:
+             - amazon
       CustomAMIv3:
          Type: Custom::AMI
          Properties:
            Filters:
              name: amzn-ami-2017.09.l-amazon-ecs-optimized
+           Owners:
+             - amazon
       Instance:
          Type: AWS::EC2::Instance
          Properties:
