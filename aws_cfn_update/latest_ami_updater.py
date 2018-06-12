@@ -255,6 +255,7 @@ class AMIUpdater(CfnUpdater):
         self.verbose = verbose
         self.ami_name_pattern = ami_name_pattern
         self.add_new_version = add_new_version
+        self.load_latest_ami_name_pattern({})
         if self.latest_ami_name_pattern is None:
             sys.stderr.write('ERROR: image name {} does not resolve to an active AMI \n'.format(self.ami_name_pattern))
             sys.exit(1)
