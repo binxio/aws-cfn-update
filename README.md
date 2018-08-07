@@ -23,7 +23,7 @@ will update:
   Properties:
     ContainerDefinitions:
       - Name: paas-monitor
-	Image: mvanholsteijn/paas-monitor:0.5.9
+        Image: mvanholsteijn/paas-monitor:0.5.9
 ```
 
 to::
@@ -33,7 +33,7 @@ to::
   Properties:
     ContainerDefinitions:
       - Name: paas-monitor
-	Image: mvanholsteijn/paas-monitor:0.6.0
+        Image: mvanholsteijn/paas-monitor:0.6.0
 ```
 
 
