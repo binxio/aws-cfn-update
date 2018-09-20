@@ -5,8 +5,9 @@ a CloudFormation template. Note that formatting and comments may be lost.
 
 Commands:
 ```
-  container-image  Updates the Docker image of ECS Container...
-  latest-ami       Updates the AMI name of Custom::AMI resources...
+  container-image           Updates the Docker image of ECS Container...
+  latest-ami                Updates the AMI name of Custom::AMI resources...
+  cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources...
 ```
 
 # container-image - Updates the Docker image of ECS Container Definitions.
@@ -124,6 +125,49 @@ to:
          Properties:
             ImageId: !Ref CustomAMIv3
 ```
+
+
+# container-image - Updates the Docker image of ECS Container Definitions.
+Updates the schedule expression of an AWS::Events::Rules resources to
+reflect the scheduled time in UTC. The required cron rule is taken
+from the description. It will update the following resource definition from:
+
+```
+DailyTaskSchedule:
+  Type: AWS::Events::Rule
+  Properties:
+    Description: run daily - cron(30 01 * * ? *)
+    Name: run daily
+    ScheduleExpression: cron(30 01 * * ? *)
+    State: ENABLED
+```
+
+to:
+
+```
+DailyTaskSchedule:
+  Type: AWS::Events::Rule
+  Properties:
+    Description: run daily - cron(30 01 * * ? *)
+    Name: run daily
+    ScheduleExpression: cron(30 23 * * ? *)
+    State: ENABLED
+```
+
+with --timezone Europe/Amsterdam and --date 2018-08-01. If the updater is
+run with --date 2018-12-01, it will change it to:
+
+```
+DailyTaskSchedule:
+  Type: AWS::Events::Rule
+  Properties:
+    Description: run daily - cron(30 01 * * ? *)
+    Name: run daily
+    ScheduleExpression: cron(30 00 * * ? *)
+    State: ENABLED
+```
+
+
 # Installation
 
 Simply run:

@@ -14,11 +14,15 @@
 #   Copyright 2018 binx.io B.V.
 import re
 from copy import copy
+from datetime import datetime
 
 import click
+import click_datetime
+import pytz
 
-from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.container_image_updater import ContainerImageUpdater
+from aws_cfn_update.cron_schedule_expression_updater import CronScheduleExpressionUpdater
+from aws_cfn_update.latest_ami_updater import AMIUpdater
 
 
 @click.group()
@@ -55,6 +59,21 @@ def task_image(ctx, image, path):
 def ami_image_update(ctx, ami_name_pattern, add_new_version, path):
     updater = AMIUpdater()
     updater.main(ami_name_pattern, ctx.obj['dry_run'], ctx.obj['verbose'], add_new_version, list(path))
+
+
+@cli.command(name='cron-schedule-expression', help=CronScheduleExpressionUpdater.__doc__)
+@click.option('--timezone', required=False, help='to use to calculate the UTC time', default="Europe/Amsterdam")
+@click.option('--date', type=click_datetime.Datetime(format='%Y-%m-%d'), default=datetime.now(),
+              help='to use as reference date')
+@click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
+@click.pass_context
+def cron_schedule_expression(ctx, timezone, date, path):
+    updater = CronScheduleExpressionUpdater()
+    try:
+        tz = pytz.timezone(timezone)
+        updater.main(tz, date, ctx.obj['dry_run'], ctx.obj['verbose'], list(path))
+    except pytz.exceptions.UnknownTimeZoneError as e:
+        raise click.BadParameter('invalid timezone specified', ctx=ctx, param='timezone')
 
 
 def main():

@@ -3,7 +3,7 @@ Programmatically update CloudFormation templates
 """
 from setuptools import find_packages, setup
 
-dependencies = ['click', 'boto3', 'cfn-flip']
+dependencies = ['click', 'boto3', 'cfn-flip', 'pytz', 'pytest', 'croniter', 'tzlocal', 'click-datetime']
 
 setup(
     name='aws-cfn-update',

@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MonthTaskSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: run monthly - cron(0 3,5,7 1 * *)
+      Name: every-month-at-3-am
+      ScheduleExpression: cron(00 3,5,7 1 * * *)
+      State: DISABLED
+      Targets:
+        - Id: 1
+          RoleArn: role-arn
+          EcsParameters:
+            TaskDefinitionArn: task-arn
+            TaskCount: 1
+          Arn: cluster-arn
