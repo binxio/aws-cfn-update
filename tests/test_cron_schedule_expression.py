@@ -55,6 +55,8 @@ def test_correct_cron_expression_for_utc():
     assert "* 7-15 * * * *" == correct_cron_expression_for_utc("* 9-17 * * * *", summer)
     assert "* 23/3 * * * *" == correct_cron_expression_for_utc("* 1/3 * * * *", summer)
     assert "* 23/3 * * ? *" == correct_cron_expression_for_utc("* 1/3 * * ? *", summer)
+    assert "* 23/3 ? * ? *" == correct_cron_expression_for_utc("* 1/3 ? * ? *", summer)
+    assert "* 23/3 ? * SUN *" == correct_cron_expression_for_utc("* 1/3 ? * SUN *", summer)
 
 
 def test_template_update():

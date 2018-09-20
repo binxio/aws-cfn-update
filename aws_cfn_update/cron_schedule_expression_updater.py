@@ -180,8 +180,8 @@ def correct_cron_expression_for_utc(expression, today):
 
     
     try:
-        if cron['day_of_week'] == '?':
-           expression = '{minutes} {hours} {day_of_month} {month} * {year}'.format(**cron)
+        ccron = {k:('*' if v == '?' else v) for (k,v) in cron.items()}
+        expression = '{minutes} {hours} {day_of_month} {month} {day_of_week} {year}'.format(**ccron)
         next_time = croniter(expression, tomorrow_midnight).get_next(datetime)
     except ValueError as e:
         sys.stderr.write('ERROR: {}'.format(e))
