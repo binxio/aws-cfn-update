@@ -17,6 +17,7 @@ import cfn_flip
 import os.path
 import json
 import collections
+from ruamel.yaml import YAML
 
 
 class CfnUpdater(object):
@@ -80,7 +81,8 @@ class CfnUpdater(object):
             if self.template_format == '.json':
                 self.template = json.load(f, object_pairs_hook=collections.OrderedDict)
             else:
-                self.template = json.loads(cfn_flip.to_json(f), object_pairs_hook=collections.OrderedDict)
+                yaml = YAML()
+                self.template = yaml.load(f)
 
     def is_cloudformation_template(self):
         """
@@ -102,10 +104,12 @@ class CfnUpdater(object):
             return
 
         body = json.dumps(self.template, separators=(',', ': '), indent=2)
-        if self.template_format == '.yaml':
-            body = cfn_flip.to_yaml(body)
         with open(self.filename, 'w') as f:
-            f.write(body)
+            if self.template_format == '.yaml':
+                yaml = YAML()
+                yaml.dump(self.template, f)
+            else:
+                json.dump(self.template, f, separators=(',', ': '), indent=2)
 
     def update_template(self):
         """
