@@ -167,6 +167,10 @@ DailyTaskSchedule:
     State: ENABLED
 ```
 
+# rest-api-body - update the body of an AWS::ApiGateway::RestApi
+
+Updates the body of a REST API Resource, with an standard Open API
+specification merged with AWS API Gateway extensions.
 
 # Installation
 
