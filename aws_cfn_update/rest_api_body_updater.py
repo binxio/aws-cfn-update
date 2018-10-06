@@ -14,8 +14,10 @@
 #   Copyright 2018 binx.io B.V.
 import sys
 
-from .cfn_updater import CfnUpdater
+import jsonmerge
 from ruamel.yaml import YAML
+
+from .cfn_updater import CfnUpdater
 
 
 class RestAPIBodyUpdater(CfnUpdater):
@@ -39,24 +41,7 @@ class RestAPIBodyUpdater(CfnUpdater):
         with open(self.api_gateway_extensions, 'r') as f:
             extensions = yaml.load(f)
 
-        for path, path_configuration in body['paths'].items():
-            for operation, operation_configuration in path_configuration.items():
-                if path in extensions['paths']:
-                    if operation in extensions['paths'][path]:
-                        for name, value in extensions['paths'][path][operation].items():
-                            if name in operation_configuration:
-                                sys.stderr.write(
-                                    'WARN: overwriting property {} on operation {} in path {}\n'.format(name, operation,
-                                                                                                        path))
-                            operation_configuration[name] = value
-                    else:
-                        sys.stderr.write(
-                            'WARN: API Gateway does not provide support for operation {} on path {}\n'.format(operation,
-                                                                                                              path))
-                else:
-                    sys.stderr.write(
-                        'WARN: API Gateway does not provide support for operations on path {}\n'.format(path))
-        return body
+        return jsonmerge.merge(body, extensions)
 
     def update_template(self):
         rest_api_gateway = self.template['Resources'][self.resource_name] if self.resource_name in self.template[
