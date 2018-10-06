@@ -7,7 +7,7 @@ dependencies = ['click', 'boto3', 'cfn-flip', 'pytz', 'pytest', 'croniter', 'tzl
 
 setup(
     name='aws-cfn-update',
-    version="0.2.0",
+    version="0.2.1",
     url='https://github.com/mvanholsteijn/aws-cfn-update',
     license='BSD',
     author='Mark van Holsteijn',
