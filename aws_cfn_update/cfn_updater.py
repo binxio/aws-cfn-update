@@ -17,7 +17,7 @@ import cfn_flip
 import os.path
 import json
 import collections
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, RoundTripDumper
 
 
 class CfnUpdater(object):
@@ -103,11 +103,10 @@ class CfnUpdater(object):
         if self.dry_run:
             return
 
-        body = json.dumps(self.template, separators=(',', ': '), indent=2)
         with open(self.filename, 'w') as f:
             if self.template_format == '.yaml':
                 yaml = YAML()
-                yaml.dump(self.template, f)
+                yaml.dump(self.template, f, Dumper=yaml.RoundTripDumper)
             else:
                 json.dump(self.template, f, separators=(',', ': '), indent=2)
 
@@ -146,3 +145,21 @@ class CfnUpdater(object):
         else:
             sys.stderr.write('ERROR: {} is not a file or directory\n'.format(path))
             sys.exit(1)
+
+
+class Ref:
+    yaml_tag = u'!Ref'
+
+    def __init__(self, reference):
+        self.reference = reference
+
+    @classmethod
+    def to_yaml(cls, representer, node):
+        return representer.represent_scalar(cls.yaml_tag, node.reference)
+
+    @classmethod
+    def from_yaml(cls, constructor, node):
+        return cls(node.value)
+
+yaml = YAML()
+yaml.register_class(Ref)

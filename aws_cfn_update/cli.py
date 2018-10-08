@@ -76,15 +76,21 @@ def cron_schedule_expression(ctx, timezone, date, path):
     except pytz.exceptions.UnknownTimeZoneError as e:
         raise click.BadParameter('invalid timezone specified', ctx=ctx, param='timezone')
 
+
 @cli.command(name='rest-api-body', help=RestAPIBodyUpdater.__doc__)
 @click.option('--resource', required=True, help='AWS::ApiGateway::RestApi body to update')
 @click.option('--open-api-specification', required=True, type=click.Path(exists=True), help='defining the interface')
-@click.option('--api-gateway-extensions', required=True, type=click.Path(exists=True), help='to add the the specification')
+@click.option('--api-gateway-extensions', required=True, type=click.Path(exists=True),
+              help='to add the the specification')
+@click.option('--add-new-version', is_flag=True, default=False,
+              help='of the RestAPI resource and replace all references')
+@click.option('--keep', default=1, help='number of versions to keep, if --add-new-version is specified')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
-def swagger_document(ctx, resource, open_api_specification, api_gateway_extensions, path):
+def swagger_document(ctx, resource, open_api_specification, api_gateway_extensions, path, add_new_version, keep):
     updater = RestAPIBodyUpdater()
-    updater.main(resource, open_api_specification, api_gateway_extensions, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
+    updater.main(resource, open_api_specification, api_gateway_extensions, list(path), add_new_version, keep,
+                 ctx.obj['dry_run'], ctx.obj['verbose'])
 
 
 def main():
