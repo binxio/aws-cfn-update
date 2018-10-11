@@ -17,7 +17,7 @@ import cfn_flip
 import os.path
 import json
 import collections
-from ruamel.yaml import YAML, RoundTripDumper
+from ruamel.yaml import YAML
 
 
 class CfnUpdater(object):
@@ -106,7 +106,7 @@ class CfnUpdater(object):
         with open(self.filename, 'w') as f:
             if self.template_format == '.yaml':
                 yaml = YAML()
-                yaml.dump(self.template, f, Dumper=yaml.RoundTripDumper)
+                yaml.dump(self.template, f)
             else:
                 json.dump(self.template, f, separators=(',', ': '), indent=2)
 

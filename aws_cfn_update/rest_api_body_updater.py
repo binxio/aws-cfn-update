@@ -155,5 +155,5 @@ class RestAPIBodyUpdater(CfnUpdater):
         self.api_gateway_extensions = api_gateway_extensions
         self.add_new_version = add_new_version
         self.keep = keep if keep > 0 else 1
-        self.body = self.load_and_merge_swagger_body()
+        self.load_and_merge_swagger_body()
         self.update(path)
