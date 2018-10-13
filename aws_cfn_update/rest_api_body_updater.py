@@ -12,17 +12,17 @@
 #   limitations under the License.
 #
 #   Copyright 2018 binx.io B.V.
-import json
+import difflib
 import re
 import sys
 from io import BytesIO
+from io import StringIO
 
-import jsondiff
 import jsonmerge
 from ruamel.yaml import YAML
 
-from aws_cfn_update.replace_references import replace_references
 from aws_cfn_update.cfn_updater import CfnUpdater
+from aws_cfn_update.replace_references import replace_references
 
 
 class RestAPIBodyUpdater(CfnUpdater):
@@ -44,6 +44,7 @@ class RestAPIBodyUpdater(CfnUpdater):
     When updating json CFN templates, the compare algorithm does
     not work properly.
     """
+
     def __init__(self):
         super(RestAPIBodyUpdater, self).__init__()
         self.resource_name = None
@@ -64,6 +65,12 @@ class RestAPIBodyUpdater(CfnUpdater):
             extensions = self.yaml.load(f)
 
         self.body = jsonmerge.merge(body, extensions)
+        self.body_as_string = self.yaml_dump_to_str(self.body)
+
+    def yaml_dump_to_str(self, dict):
+        s = StringIO()
+        self.yaml.dump(dict, s)
+        return s.getvalue()
 
     def resource_name_pattern(self):
         return re.compile('^(?P<basename>{})(v(?P<version>[0-9]+))?$'.format(self.resource_name))
@@ -79,7 +86,8 @@ class RestAPIBodyUpdater(CfnUpdater):
         if resources:
             result = list(filter(lambda name: 'Type' in resources[name] and resources[name][
                 'Type'] == 'AWS::ApiGateway::RestApi', filter(lambda name: pattern.match(name), resources)))
-            result.sort(key = lambda n : int(pattern.match(n).group('version')) if pattern.match(n).group('version') else -1)
+            result.sort(
+                key=lambda n: int(pattern.match(n).group('version')) if pattern.match(n).group('version') else -1)
         return result
 
     def new_resource_name(self, name):
@@ -104,16 +112,15 @@ class RestAPIBodyUpdater(CfnUpdater):
 
         name = resources[-1]
         rest_api_gateway = self.template['Resources'][name]
-        current_body = rest_api_gateway.get('Properties',{}).get('Body', {})
+        current_body = rest_api_gateway.get('Properties', {}).get('Body', {})
 
-        if self.body != current_body:
+        current_body_as_string = self.yaml_dump_to_str(current_body) if current_body else ''
+        if self.body_as_string != current_body_as_string:
 
             if self.verbose:
-                sys.stderr.write('INFO: diff in Open API specification:')
-                diffs = json.loads(
-                    jsondiff.diff(current_body, self.body, syntax='explicit', dump=True))
-                json.dump(diffs, sys.stderr, indent=2)
-                sys.stderr.write('\n')
+                for text in difflib.unified_diff(current_body_as_string.split("\n"), self.body_as_string.split("\n")):
+                    if text[:3] not in ['---', '+++']:
+                        sys.stderr.write('{}\n'.format(text))
 
             rest_api_gateway = self.copy_resource(rest_api_gateway)
             if not 'Properties' in rest_api_gateway:
@@ -129,9 +136,6 @@ class RestAPIBodyUpdater(CfnUpdater):
                 new_name = name
                 sys.stderr.write(
                     'INFO: updating resource {} with swagger body in template {}\n'.format(new_name, self.filename))
-
-            if self.dry_run:
-                return
 
             if self.add_new_version:
                 replace_references(self.template, name, new_name)
