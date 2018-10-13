@@ -56,7 +56,7 @@ class RestAPIBodyUpdater(CfnUpdater):
         self.dry_run = False
         self.keep = 1
         self.yaml = YAML()
-        self.body = {}
+        self._body = {}
 
     def load_and_merge_swagger_body(self):
         with open(self.open_api_specification, 'r') as f:
@@ -65,7 +65,15 @@ class RestAPIBodyUpdater(CfnUpdater):
             extensions = self.yaml.load(f)
 
         self.body = jsonmerge.merge(body, extensions)
-        self.body_as_string = self.yaml_dump_to_str(self.body)
+
+    @property
+    def body(self):
+        return self._body
+
+    @body.setter
+    def body(self, body):
+        self._body = body
+        self.body_as_string = self.yaml_dump_to_str(self.body) if body else ''
 
     def yaml_dump_to_str(self, dict):
         s = StringIO()
