@@ -24,6 +24,7 @@ from aws_cfn_update.container_image_updater import ContainerImageUpdater
 from aws_cfn_update.cron_schedule_expression_updater import CronScheduleExpressionUpdater
 from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
+from aws_cfn_update.lambda_inline_code_updater import LambdaInlineCodeUpdater
 
 
 @click.group()
@@ -91,6 +92,20 @@ def swagger_document(ctx, resource, open_api_specification, api_gateway_extensio
     updater = RestAPIBodyUpdater()
     updater.main(resource, open_api_specification, api_gateway_extensions, list(path), add_new_version, keep,
                  ctx.obj['dry_run'], ctx.obj['verbose'])
+
+
+
+@cli.command(name='lambda-inline-code', help=LambdaInlineCodeUpdater.__doc__)
+@click.option('--resource', required=True, help='name of the AWS::Lambda::Function to update')
+@click.option('--file', required=True, type=click.Path(exists=True), help='containing the source')
+@click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
+@click.pass_context
+def lambda_body(ctx, resource, file, path):
+    updater = LambdaInlineCodeUpdater()
+
+    with open(file, 'r') as f:
+        body = f.read()
+    updater.main(resource, body, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
 
 
 def main():

@@ -172,6 +172,31 @@ DailyTaskSchedule:
 Updates the body of a REST API Resource, with an standard Open API
 specification merged with AWS API Gateway extensions.
 
+
+# lambda-inline-code - updates the inline code of an AWS::Lambda::Function resource.
+
+Update the inline code of a AWS::Lambda::Function to include the content of the
+specified file.  It changes:
+
+```
+    ELBListenerRuleProvider:
+      Type: AWS::Lambda::Function
+      Function: cfn-listener-rule-provider
+```
+into:
+```
+    ELBListenerRuleProvider:
+      Type: AWS::Lambda::Function
+      Properties:
+        Code:
+          ZipFile:
+            import boto3
+            import cfnresponse
+            ELB = boto3.client('elbv2')
+            ...
+        Function: cfn-listener-rule-provider
+```
+
 # Installation
 
 Simply run:
