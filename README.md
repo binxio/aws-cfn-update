@@ -185,6 +185,7 @@ dictionary keys in th specifications are strings, not integers (especially
 the case with `responses`). When updating json CFN templates, the compare
 algorithm does not work properly.
 
+```
 Options:
   --resource TEXT                AWS::ApiGateway::RestApi body to update
                                  [required]
@@ -194,8 +195,7 @@ Options:
                                  references
   --keep INTEGER                 number of versions to keep, if --add-new-
                                  version is specified
-  --help                         Show this message and exit.
-
+```
 
 # lambda-inline-code - updates the inline code of an AWS::Lambda::Function resource.
 
