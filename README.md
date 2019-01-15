@@ -172,6 +172,30 @@ DailyTaskSchedule:
 Updates the body of a REST API Resource, with an standard Open API
 specification merged with AWS API Gateway extensions.
 
+If you specify --add-new-version, it will create a new version of the
+resource and update all references to it. This will enforce the deployment
+of the new api.
+
+If you want to keep the previous definition, specify --keep to a value of
+2 or higher. This might be handy if you have old clients still accessing
+the old version of the API.
+
+If no changes are detected, no changes are made. Please make sure that all
+dictionary keys in th specifications are strings, not integers (especially
+the case with `responses`). When updating json CFN templates, the compare
+algorithm does not work properly.
+
+Options:
+  --resource TEXT                AWS::ApiGateway::RestApi body to update
+                                 [required]
+  --open-api-specification PATH  defining the interface  [required]
+  --api-gateway-extensions PATH  to add the the specification  [required]
+  --add-new-version              of the RestAPI resource and replace all
+                                 references
+  --keep INTEGER                 number of versions to keep, if --add-new-
+                                 version is specified
+  --help                         Show this message and exit.
+
 
 # lambda-inline-code - updates the inline code of an AWS::Lambda::Function resource.
 
