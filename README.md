@@ -187,14 +187,11 @@ algorithm does not work properly.
 
 ```
 Options:
-  --resource TEXT                AWS::ApiGateway::RestApi body to update
-                                 [required]
+  --resource TEXT                AWS::ApiGateway::RestApi body to update [required]
   --open-api-specification PATH  defining the interface  [required]
   --api-gateway-extensions PATH  to add the the specification  [required]
-  --add-new-version              of the RestAPI resource and replace all
-                                 references
-  --keep INTEGER                 number of versions to keep, if --add-new-
-                                 version is specified
+  --add-new-version              of the RestAPI resource and replace all references
+  --keep INTEGER                 number of versions to keep, if --add-new-version is specified
 ```
 
 # lambda-inline-code - updates the inline code of an AWS::Lambda::Function resource.
