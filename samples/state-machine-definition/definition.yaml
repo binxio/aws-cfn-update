@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: An example template with an IAM role for a Lambda state machine.
+Description: Example template with an IAM role for a Lambda state machine.
 Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
