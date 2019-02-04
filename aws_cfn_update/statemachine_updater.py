@@ -30,7 +30,7 @@ class StateMachineDefinitionUpdater(CfnUpdater):
     def __init__(self):
         super(StateMachineDefinitionUpdater, self).__init__()
         self.resource_name = None
-        self.definition = None
+        self._definition = None
         self.definition_file = None
         self.template = None
         self.with_fn_sub = True
@@ -61,6 +61,14 @@ class StateMachineDefinitionUpdater(CfnUpdater):
                 if self.verbose:
                     sys.stderr.write(
                         'INFO: no changes to definition of state machine {}\n'.format(self.resource_name))
+
+    @property
+    def definition(self):
+        return self._definition
+
+    @definition.setter
+    def definition(self, definition):
+        self._definition = LiteralScalarString(definition) if not isinstance(definition, LiteralScalarString) else definition
 
     def read_definition(self, filename):
         self.definition_file = filename
