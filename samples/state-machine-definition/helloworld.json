@@ -1,0 +1,11 @@
+{
+  "Comment": "A Hello World AWL example using an AWS Lambda function",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Task",
+      "Resource": "${lambdaArn.Arn}",
+      "End": true
+    }
+  }
+}

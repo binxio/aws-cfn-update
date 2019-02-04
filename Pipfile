@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+aws_cfn_update = {editable = true, path = "."}
 
 [dev-packages]
 

@@ -25,7 +25,7 @@ from aws_cfn_update.cron_schedule_expression_updater import CronScheduleExpressi
 from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 from aws_cfn_update.lambda_inline_code_updater import LambdaInlineCodeUpdater
-
+from aws_cfn_update.statemachine_updater import update_state_machine_definition
 
 @click.group()
 @click.option('--dry-run', is_flag=True, default=False,
@@ -107,10 +107,11 @@ def lambda_body(ctx, resource, file, path):
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
 
-
+update_state_machine_definition
 def main():
     cli()
 
+cli.add_command(update_state_machine_definition)
 
 if __name__ == '__main__':
     main()
