@@ -218,6 +218,27 @@ into:
         Function: cfn-listener-rule-provider
 ```
 
+# state-machine-definition - updates the definition string of an AWS::StepFunctions::StateMachine
+
+Updates the definition of an AWS::StepFunctions::StateMachine.
+
+The definition is read from the file specified by --definition. By
+default, the content will be passed into the Fn::Sub function to allow
+references to parameters and resource attributes in the template.
+
+If you do not want substitution for your definition, specify --no-fn-sub.
+
+```
+Options:
+  --resource TEXT         AWS::StepFunctions::StateMachine definition to
+                          update  [required]
+  --definition PATH       of the state machine  [required]
+  --fn-sub / --no-fn-sub  for the definition
+  --help                  Show this message and exit.
+```
+
+For an example, check out [./samples/state-machine-definition]
+
 # Installation
 
 Simply run:
