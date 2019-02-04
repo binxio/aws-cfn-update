@@ -178,9 +178,8 @@ def correct_cron_expression_for_utc(expression, today):
     cron = match.groupdict()
     tomorrow_midnight = today.tzinfo.localize(datetime(today.year, today.month, today.day) + timedelta(days=1))
 
-    
     try:
-        ccron = {k:('*' if v == '?' else v) for (k,v) in cron.items()}
+        ccron = {k: ('*' if v == '?' else v) for (k, v) in cron.items()}
         expression = '{minutes} {hours} {day_of_month} {month} {day_of_week} {year}'.format(**ccron)
         next_time = croniter(expression, tomorrow_midnight).get_next(datetime)
     except ValueError as e:

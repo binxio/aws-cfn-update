@@ -1,8 +1,8 @@
-from aws_cfn_update.replace_references import  replace_references
+from aws_cfn_update.replace_references import replace_references
 
 
 def test_simple():
-    template = { 'Ref': 'Old'}
+    template = {'Ref': 'Old'}
     replace_references(template, 'Old', 'New')
     assert template['Ref'] == 'New'
 

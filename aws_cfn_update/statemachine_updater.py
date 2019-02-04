@@ -37,7 +37,6 @@ class StateMachineDefinitionUpdater(CfnUpdater):
         self.verbose = False
         self.dry_run = False
 
-
     def new_value(self, definition):
         if self.with_fn_sub:
             return isinstance(definition, dict) and definition.get('Fn::Sub') == self.definition, {'Fn::Sub': self.definition}

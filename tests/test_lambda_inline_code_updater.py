@@ -10,6 +10,7 @@ sample = {
     }
 }
 
+
 def test_replace_body():
     updater = Updater()
     updater.resource = 'Lambda'
@@ -23,6 +24,7 @@ def test_replace_body():
     assert 'ZipFile' in updater.template['Resources']['Lambda']['Properties']['Code']
     assert updater.template['Resources']['Lambda']['Properties']['Code']['ZipFile'] == 'print("hello world!")'
 
+
 skip_body_sample = {
     "Resources": {
         "Lambda": {
@@ -30,6 +32,8 @@ skip_body_sample = {
         }
     }
 }
+
+
 def test_skip_body():
     updater = Updater()
     updater.resource = 'Lambda'

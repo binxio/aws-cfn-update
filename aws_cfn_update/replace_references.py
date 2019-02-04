@@ -1,6 +1,7 @@
 import re
 from aws_cfn_update.cfn_updater import Ref
 
+
 def replace_references(template, old_reference, new_reference):
     """
     replaces CloudFormation references { "Ref": old_reference } with { "Ref": new_reference } in `template`.
@@ -17,4 +18,4 @@ def replace_references(template, old_reference, new_reference):
         for i, value in enumerate(template):
             replace_references(value, old_reference, new_reference)
     else:
-        pass # a primitive, no recursive required.
+        pass  # a primitive, no recursive required.

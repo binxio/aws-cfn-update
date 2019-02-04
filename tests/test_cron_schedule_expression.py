@@ -3,11 +3,13 @@ from datetime import datetime, tzinfo
 from aws_cfn_update.cron_schedule_expression_updater import aws_cron_pattern, CronScheduleExpressionUpdater as Updater
 from aws_cfn_update.cron_schedule_expression_updater import correct_for_utc, correct_cron_hours_expression_for_utc, correct_cron_expression_for_utc
 
+
 def test_cron_pattern_match():
     description = """
     run every hour cron(0 4 * * * *)
     """
     assert aws_cron_pattern.search(description)
+
 
 def test_hour_correct_for_utc():
     summer = pytz.timezone('Europe/Berlin').localize(datetime(2018, 8, 1))
@@ -25,6 +27,7 @@ def test_hour_correct_for_utc():
     assert 1 == correct_for_utc(2, winter.utcoffset())
     assert 11 == correct_for_utc(12, winter.utcoffset())
     assert 22 == correct_for_utc(23, winter.utcoffset())
+
 
 def test_correct_cron_hours_expression_for_utc():
     summer = pytz.timezone('Europe/Berlin').localize(datetime(2018, 8, 1))
@@ -67,7 +70,7 @@ def test_template_update():
                 'Properties': {
                     'Description': 'Run every hour - cron(0 1/3 * * * *)',
                     'ScheduleExpression': 'cron(Minutes Hours Day-of-month Month Day-of-week Year)'
-                    }}}}
+                }}}}
     updater = Updater()
     updater.template = template
     updater.timezone = pytz.timezone('Europe/Amsterdam')
@@ -95,4 +98,3 @@ def test_template_update_incorrect_cron():
     assert not updater.dirty
     properties = template.get('Resources').get('Schedule').get('Properties')
     assert properties['ScheduleExpression'] == 'cron(Minutes Hours Day-of-month Month Day-of-week Year)'
-

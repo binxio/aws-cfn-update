@@ -45,13 +45,13 @@ class LambdaInlineCodeUpdater(CfnUpdater):
         """
         updates the Code property of a AWS::Lambda::Function resource of name `self.resource` to `self.code`
         """
-        resource = self.template.get('Resources',{}).get(self.resource, None)
+        resource = self.template.get('Resources', {}).get(self.resource, None)
         if resource and resource['Type'] == 'AWS::Lambda::Function':
-            code = resource.get('Properties',{}).get('Code', {})
+            code = resource.get('Properties', {}).get('Code', {})
             old_code = code['ZipFile'] if 'ZipFile' in code else None
             if old_code != self.code:
                 sys.stderr.write(
-                    'INFO: updating inline code of lambda {} in {}\n'.format( self.resource, self.filename))
+                    'INFO: updating inline code of lambda {} in {}\n'.format(self.resource, self.filename))
                 if 'Properties' not in resource:
                     resource['Properties'] = {}
                 if 'Code' not in resource['Properties']:
@@ -60,7 +60,7 @@ class LambdaInlineCodeUpdater(CfnUpdater):
                 self.dirty = True
         elif resource:
             sys.stderr.write(
-                'WARN: resource {} in {} is not of type AWS::Lambda::Function\n'.format( self.resource, self.filename))
+                'WARN: resource {} in {} is not of type AWS::Lambda::Function\n'.format(self.resource, self.filename))
 
     def main(self, resource, code, paths, dry_run, verbose):
         self.resource = resource

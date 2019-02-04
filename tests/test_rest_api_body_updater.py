@@ -1,6 +1,7 @@
 from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 import json
 
+
 def test_new_resource_name():
     updater = RestAPIBodyUpdater()
 
@@ -69,22 +70,24 @@ sample = {
     }
 }
 
+
 def test_replace_body():
     updater = RestAPIBodyUpdater()
     updater.resource_name = 'RestAPI'
     updater.template = json.loads(json.dumps(sample))
-    updater.body = { 'swagger': '2.0', 'description': 'a new one'}
+    updater.body = {'swagger': '2.0', 'description': 'a new one'}
 
     updater.update_template()
     assert updater.dirty
     assert 'description' in updater.template['Resources']['RestAPI']['Properties']['Body']
     assert updater.template['Resources']['RestAPI']['Properties']['Body']['description'] == 'a new one'
 
+
 def test_add_new_version():
     updater = RestAPIBodyUpdater()
     updater.resource_name = 'RestAPI'
     updater.template = json.loads(json.dumps(sample))
-    updater.body = { 'swagger': '2.0', 'description': 'a new one'}
+    updater.body = {'swagger': '2.0', 'description': 'a new one'}
 
     updater.add_new_version = True
     updater.update_template()
@@ -146,11 +149,13 @@ multiple = {
         }
     }
 }
+
+
 def test_add_new_version_keep_two():
     updater = RestAPIBodyUpdater()
     updater.resource_name = 'RestAPI'
     updater.template = json.loads(json.dumps(multiple))
-    updater.body = { 'swagger': '2.0', 'description': 'a new one'}
+    updater.body = {'swagger': '2.0', 'description': 'a new one'}
 
     updater.add_new_version = True
     updater.keep = 2
