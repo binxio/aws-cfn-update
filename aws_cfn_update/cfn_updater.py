@@ -161,5 +161,22 @@ class Ref:
     def from_yaml(cls, constructor, node):
         return cls(node.value)
 
+
+class Sub:
+    yaml_tag = u'!Sub'
+
+    def __init__(self, reference):
+        self.reference = reference
+
+    @classmethod
+    def to_yaml(cls, representer, node):
+        return representer.represent_scalar(cls.yaml_tag, node.reference)
+
+    @classmethod
+    def from_yaml(cls, constructor, node):
+        return cls(node.value)
+
+
 yaml = YAML()
 yaml.register_class(Ref)
+yaml.register_class(Sub)
