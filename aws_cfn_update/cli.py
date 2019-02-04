@@ -75,7 +75,7 @@ def cron_schedule_expression(ctx, timezone, date, path):
     try:
         tz = pytz.timezone(timezone)
         updater.main(tz, date, ctx.obj['dry_run'], ctx.obj['verbose'], list(path))
-    except pytz.exceptions.UnknownTimeZoneError as e:
+    except pytz.exceptions.UnknownTimeZoneError:
         raise click.BadParameter('invalid timezone specified', ctx=ctx, param='timezone')
 
 
@@ -107,15 +107,12 @@ def lambda_body(ctx, resource, file, path):
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
 
-
-update_state_machine_definition
-
+cli.add_command(update_state_machine_definition)
 
 def main():
     cli()
 
 
-cli.add_command(update_state_machine_definition)
 
 if __name__ == '__main__':
     main()

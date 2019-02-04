@@ -12,21 +12,25 @@
 #   limitations under the License.
 #
 #   Copyright 2018 binx.io B.V.
-import json
 import sys
-from collections import OrderedDict
+
 import click
 from ruamel.yaml.scalarstring import LiteralScalarString
 
 from aws_cfn_update.cfn_updater import CfnUpdater
-from cfn_updater import Sub
 
 
 class StateMachineDefinitionUpdater(CfnUpdater):
     """
     Updates the definition of an AWS::StepFunctions::StateMachine.
-    """
 
+    The definition is read from the file specified by --definition.
+    By default, the content will be passed into the Fn::Sub function to
+    allow references to parameters and resource attributes in the template.
+
+    If you do not want substitution for your definition, specify --no-fn-sub.
+
+    """
     def __init__(self):
         super(StateMachineDefinitionUpdater, self).__init__()
         self.resource_name = None
@@ -87,9 +91,9 @@ class StateMachineDefinitionUpdater(CfnUpdater):
 @click.command(name='state-machine-definition', help=StateMachineDefinitionUpdater.__doc__)
 @click.option('--resource', required=True, help='AWS::StepFunctions::StateMachine definition to update')
 @click.option('--definition', required=True, type=click.Path(exists=True), help='of the state machine')
-@click.option('--with-fn-sub/--without-fn-sub', required=False, default=True, help='for the definition')
+@click.option('--fn-sub/--no-fn-sub', required=False, default=True, help='for the definition')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
-def update_state_machine_definition(ctx, resource, definition, with_fn_sub, path):
+def update_state_machine_definition(ctx, resource, definition, fn_sub, path):
     updater = StateMachineDefinitionUpdater()
-    updater.main(resource, definition, with_fn_sub, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
+    updater.main(resource, definition, fn_sub, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
