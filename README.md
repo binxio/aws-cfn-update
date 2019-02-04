@@ -237,7 +237,7 @@ Options:
   --help                  Show this message and exit.
 ```
 
-For an example, check out [./samples/state-machine-definition]
+For an example, check out [./samples/state-machine-definition](./samples/state-machine-definition)
 
 # Installation
 
