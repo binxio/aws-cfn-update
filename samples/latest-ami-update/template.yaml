@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  AMI:
+    Type: Custom::AMI
+    Properties:
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
+      Filters:
+        name: amzn-ami-2017.03.g-amazon-ecs-optimized
+        owner-alias: amazon
+Outputs:
+  AMI:
+    Description: ami
+    Value: !Ref 'AMI'

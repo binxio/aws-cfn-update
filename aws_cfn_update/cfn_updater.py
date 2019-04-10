@@ -13,7 +13,6 @@
 #
 #   Copyright 2018 binx.io B.V.
 import sys
-import cfn_flip
 import os.path
 import json
 import collections
@@ -88,7 +87,7 @@ class CfnUpdater(object):
         """
         returns true if the `self.template` is a AWS CloudFormation template
         """
-        return 'AWSTemplateFormatVersion' in self.template
+        return self.template and 'AWSTemplateFormatVersion' in self.template
 
     def write(self):
         """
@@ -146,37 +145,4 @@ class CfnUpdater(object):
             sys.stderr.write('ERROR: {} is not a file or directory\n'.format(path))
             sys.exit(1)
 
-
-class Ref:
-    yaml_tag = u'!Ref'
-
-    def __init__(self, reference):
-        self.reference = reference
-
-    @classmethod
-    def to_yaml(cls, representer, node):
-        return representer.represent_scalar(cls.yaml_tag, node.reference)
-
-    @classmethod
-    def from_yaml(cls, constructor, node):
-        return cls(node.value)
-
-
-class Sub:
-    yaml_tag = u'!Sub'
-
-    def __init__(self, reference):
-        self.reference = reference
-
-    @classmethod
-    def to_yaml(cls, representer, node):
-        return representer.represent_scalar(cls.yaml_tag, node.reference)
-
-    @classmethod
-    def from_yaml(cls, constructor, node):
-        return cls(node.value)
-
-
 yaml = YAML()
-yaml.register_class(Ref)
-yaml.register_class(Sub)

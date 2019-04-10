@@ -1,5 +1,4 @@
-import re
-from aws_cfn_update.cfn_updater import Ref
+from ruamel.yaml.comments import TaggedScalar
 
 
 def replace_references(template, old_reference, new_reference):
@@ -10,8 +9,8 @@ def replace_references(template, old_reference, new_reference):
         for name, value in template.items():
             if name == 'Ref' and value == old_reference:
                 template['Ref'] = new_reference
-            elif isinstance(value, Ref) and value.reference == old_reference:
-                value.reference = new_reference
+            elif isinstance(value, TaggedScalar) and value.tag and value.tag.value == '!Ref' and value.value == old_reference:
+                value.value = new_reference
             else:
                 replace_references(template[name], old_reference, new_reference)
     elif isinstance(template, list):
