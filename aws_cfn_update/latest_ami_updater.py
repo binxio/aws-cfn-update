@@ -15,7 +15,7 @@
 import fnmatch
 import re
 import sys
-
+import copy
 import json
 import boto3
 
@@ -235,7 +235,7 @@ class AMIUpdater(CfnUpdater):
         for ami_resources in self.custom_ami_resources_partitions():
             resource_name = self.latest_custom_ami_resource(ami_resources)
             if resource_name is not None:
-                ami = json.loads(json.dumps(self.resources[resource_name]))
+                ami = copy.deepcopy(self.resources[resource_name])
                 self.load_latest_ami_name_pattern(ami)
                 if self.ami_requires_update(ami):
                     new_resource_name = make_new_resource_name(resource_name)
