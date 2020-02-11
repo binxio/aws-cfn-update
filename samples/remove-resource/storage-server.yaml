@@ -14,69 +14,6 @@ Parameters:
     Type: String
 Resources:
   # safe this comment, please
-  StorageGatewayServer:
-    Type: AWS::EC2::Instance
-    Properties:
-      Tags:
-        - Key: Name
-          Value: "Storage Gateway Server"
-      InstanceType: 'c4.2xlarge'
-      IamInstanceProfile: !Ref 'StorageGatewayProfile'
-      InstanceInitiatedShutdownBehavior: terminate
-      ImageId: !Ref StorageGatewayAMI
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: 'false'
-          DeviceIndex: '0'
-          GroupSet:
-            - !Ref 'DefaultSecurityGroup'
-          SubnetId: !Select [0, !Ref 'Subnets']
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash -x
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource StorageGatewayServer --region ${AWS::Region}
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource StorageGatewayServer --region ${AWS::Region}
-
-    Metadata: 
-      AWS::CloudFormation::Init:
-          configSets:
-              default:
-                  - install
-          install:
-              files:
-                # These files are needed for CloudFormation::Init to work
-                /etc/cfn/cfn-hup.conf:
-                    content: !Sub |
-                        [main]
-                        stack=${AWS::StackId}
-                        region=${AWS::Region}
-                        interval=1
-                /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-                    content: !Sub |
-                        [cfn-auto-reloader-hook]
-                        triggers=post.update
-                        path=Resources.Server.Metadata.AWS::CloudFormation::Init
-                        action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource StorageGatewayServer
-                        runas=root
-              commands: 
-                activate:
-                  command: >
-                    aws storagegateway activate-gateway
-                    --activation-key 
-                      $(curl -sS "http://localhost:8080/?gatewayType=CACHED&activationRegion=$REGION" | sed -n  -e 's/.*activationKey=\([A-Z0-9\-][A-Z0-9\-]*\).*/\1/p')
-                    --gateway-name qrm-storage-gateway
-                    --gateway-timezone Europe/Amsterdam
-                    --gateway-type CACHED
-                    --gateway-region $REGION
-                    --region $REGION
-                    --output text
-                  env:
-                    REGION: !Ref 'AWS::Region'
-              services:
-                  sysvinit:
-                      cfn-hup:
-                          enabled: true
-                          ensureRunning: true
-
   StorageGatewayEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
@@ -94,7 +31,7 @@ Resources:
       Filters:
         name: aws-storage-gateway-1579034108
       Owners:
-        - 'amazon'
+        - amazon
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
 
   UploadDisk:
@@ -106,14 +43,8 @@ Resources:
       Encrypted: true
       Tags:
         - Key: Name
-          Value: 'Storage Gateway - Upload Buffer Disk'
+          Value: Storage Gateway - Upload Buffer Disk
 
-  UploadDiskAttachment:
-    Type: AWS::EC2::VolumeAttachment
-    Properties:
-      Device: /dev/sdc
-      InstanceId: !Ref 'StorageGatewayServer'
-      VolumeId: !Ref 'UploadDisk'
 
   CacheDisk:
     Type: AWS::EC2::Volume
@@ -124,14 +55,8 @@ Resources:
       Encrypted: true
       Tags:
         - Key: Name
-          Value: 'Storage Gateway - Cache Disk'
+          Value: Storage Gateway - Cache Disk
 
-  CacheDiskAttachment:
-    Type: AWS::EC2::VolumeAttachment
-    Properties:
-      Device: /dev/sdd
-      InstanceId: !Ref 'StorageGatewayServer'
-      VolumeId: !Ref 'CacheDisk'
 
   StorageGatewayProfile:
     Type: AWS::IAM::InstanceProfile
