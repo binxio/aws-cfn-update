@@ -32,8 +32,8 @@ class AddNewResources(CfnUpdater):
 
 
 @click.command(name='add-new-resources', help=AddNewResources.__doc__)
-@click.option('--source', required=True, help='template to add resources from', type=click.File(exists=True))
-@click.argument('path', nargs=1, required=True, type=click.File(exists=True))
+@click.option('--source', required=True, help='template to add resources from', type=click.Path(exists=True))
+@click.argument('path', nargs=1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def add_new_resources(ctx, source, path):
     updater = AddNewResources()
