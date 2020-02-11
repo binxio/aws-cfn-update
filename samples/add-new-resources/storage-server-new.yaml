@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Storage Gateway Server
+Parameters:
+  VPC:
+    Type: String
+    Default: /Vpc/Default/Id
+  Subnets:
+    Type: List<String>
+  DefaultSecurityGroup:
+    Type: String
+  PrivateHostedZoneId:
+    Type: String
+  PrivateHostedZoneName:
+    Type: String
+Resources:
+  # safe this comment, please
+  StorageGatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: com.amazonaws.eu-central-1.storagegateway
+      VpcEndpointType: Interface
+      VpcId: !Ref VPC
+      SubnetIds: !Ref Subnets
+      SecurityGroupIds:
+        - !Ref 'DefaultSecurityGroup'
+      PrivateDnsEnabled: true
+
+  StorageGatewayAMI:
+    Type: Custom::AMI
+    Properties:
+      Filters:
+        name: aws-storage-gateway-v1
+      Owners:
+        - amazon
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
+
+  StorageGatewayAMIv1:
+    Type: Custom::AMI
+    Properties:
+      Filters:
+        name: aws-storage-gateway-v2
+      Owners:
+        - amazon
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
+
+
+  UploadDisk:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: !GetAtt 'StorageGatewayServer.AvailabilityZone'
+      Size: 100
+      VolumeType: gp2
+      Encrypted: true
+      Tags:
+        - Key: Name
+          Value: Storage Gateway - Upload Buffer Disk
+
+
+  CacheDisk:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: !GetAtt 'StorageGatewayServer.AvailabilityZone'
+      Size: 200
+      VolumeType: gp2
+      Encrypted: true
+      Tags:
+        - Key: Name
+          Value: Storage Gateway - Cache Disk
+
+
+  StorageGatewayProfile:
+    Type: AWS::IAM::InstanceProfile
+    DependsOn: RolePolicy
+    Properties:
+      Path: /
+      Roles:
+        - !Ref 'Role'
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      PermissionsBoundary: !Sub 'arn:aws:iam::${AWS::AccountId}:policy/PermissionsBoundary'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonSSMDirectoryServiceAccess
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  RolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: storagegateway:*
+            Effect: Allow
+            Resource: '*'
+          - Action: ec2:DescribeNetworkInterfaces
+            Effect: Allow
+            Resource: '*'
+          - Action: ec2:CreateTags
+            Effect: Allow
+            Resource: '*'
+        Version: '2012-10-17'
+      PolicyName: RolePolicy
+      Roles:
+        - !Ref 'Role'
