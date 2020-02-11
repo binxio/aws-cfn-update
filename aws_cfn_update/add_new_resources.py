@@ -12,19 +12,10 @@
 #   limitations under the License.
 #
 #   Copyright 2018 binx.io B.V.
-import fnmatch
-import re
-import copy
 import click
-import json
-import boto3
-from typing import List
-from ruamel.yaml.comments import TaggedScalar, CommentedSeq
 
 from .add_missing_resources import add_missing_resources
 from .cfn_updater import CfnUpdater, read_template
-
-import logging
 
 
 class AddNewResources(CfnUpdater):
@@ -42,11 +33,11 @@ class AddNewResources(CfnUpdater):
 
 @click.command(name='add-new-resources', help=AddNewResources.__doc__)
 @click.option('--source', required=True, help='template to add resources from', type=click.File(exists=True))
-@click.option('--target', required=True, help='template to add resources to', type=click.File(exists=True))
+@click.argument('path', nargs=1, required=True, type=click.File(exists=True))
 @click.pass_context
-def add_new_resources(ctx, source, target):
+def add_new_resources(ctx, source, path):
     updater = AddNewResources()
     updater.dry_run = ctx.obj['dry_run']
     updater.verbose = ctx.obj['verbose']
     updater.source = read_template(source)
-    updater.update(target)
+    updater.update(path)
