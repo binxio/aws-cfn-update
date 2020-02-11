@@ -5,10 +5,88 @@ a CloudFormation template. Note that formatting and comments may be lost.
 
 Commands:
 ```
-  container-image           Updates the Docker image of ECS Container...
-  latest-ami                Updates the AMI name of Custom::AMI resources...
-  cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources...
+  container-image           Updates the Docker image of ECS Container Task definition
+  latest-ami                Updates the AMI name of Custom::AMI resources
+  cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources
+  remove-resource           Removes the specified CloudFormation resource
+  add-new-resources         add new resources that exist in the new template
+  lambda-inline-code        Updates the inline code of an Lambda
+  rest-api-body             Updates the body of a REST API Resource
+  state-machine-definition  Updates the definition of an AWS::StepFunctions::StateMachine.
 ```
+
+# remove-resource - removes the specified resource and all referencing resources
+
+will remove the specified resource and all of the references. For example, the command:
+```
+aws-cfn-update remove-resource --resource AMI .
+```
+will update:
+
+```yaml
+Resources:
+  AMI: 
+    Type: Custom::AMI
+  EC2Instance:
+    ImageId: !Ref AMI
+  AMIv2:
+    Type: Custom::AMI
+```
+
+to:
+
+```yaml
+Resources:
+  AMIv2:
+    Type: Custom::AMI
+```
+
+# add-new-resources - adds new resources from another template
+
+will add missing parameters, conditions, mappings and resources from another template to this template. For example, given the following
+template:
+```
+Parameters:
+  Vpc:
+    Type: String
+Resources:
+  AMI: 
+    Type: Custom::AMI
+  AMIv2: 
+    Type: Custom::AMI
+  EC2Instance:
+    ImageId: !Ref AMI
+```
+The following command:
+```
+aws-cfn-update add-new-resources --source new.yaml old.yaml
+```
+
+will update old.yaml:
+
+```yaml
+Resources:
+  AMI: 
+    Type: Custom::AMI
+  EC2Instance:
+    ImageId: !Ref AMI
+```
+
+to:
+
+```yaml
+Parameters:
+  Vpc:
+    Type: String
+Resources:
+  AMI: 
+    Type: Custom::AMI
+  AMIv2: 
+    Type: Custom::AMI
+  EC2Instance:
+    ImageId: !Ref AMI
+```
+
 
 # container-image - Updates the Docker image of ECS Container Definitions.
 
