@@ -125,7 +125,7 @@ class CfnUpdater(object):
         recursively updates all the cloudformation templates in the specified `path`. `path` may be a file,
         a directory or a list of paths.
         """
-        if isinstance(path, list):
+        if isinstance(path, (list, tuple)):
             for p in path:
                 self.update(p)
         elif os.path.isfile(path):
