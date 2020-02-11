@@ -148,12 +148,12 @@ class ResourceRemover(CfnUpdater):
 
 
 @click.command(name='remove-resource', help=ResourceRemover.__doc__)
-@click.option('--resource-name', required=True, help='to remove from the template')
+@click.option('--resource', required=True, help='to remove from the template')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
-def remove_resource(ctx, resource_name, path):
+def remove_resource(ctx, resource, path):
     updater = ResourceRemover()
     updater.dry_run = ctx.obj['dry_run']
     updater.verbose = ctx.obj['verbose']
-    updater.resource_name = resource_name
+    updater.resource_name = resource
     updater.update(path)
