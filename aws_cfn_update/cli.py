@@ -26,6 +26,7 @@ from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 from aws_cfn_update.lambda_inline_code_updater import LambdaInlineCodeUpdater
 from aws_cfn_update.statemachine_updater import update_state_machine_definition
+from aws_cfn_update.remove_resource import remove_resource
 
 
 @click.group()
@@ -108,6 +109,7 @@ def lambda_body(ctx, resource, file, path):
     updater.main(resource, body, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
 
 cli.add_command(update_state_machine_definition)
+cli.add_command(remove_resource)
 
 def main():
     cli()
