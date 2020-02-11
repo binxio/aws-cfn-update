@@ -1,6 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
-  AMI:
+  AMIv2:
+    Type: Custom::AMI
+    Properties:
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
+      Filters:
+        name: amzn-ami-2017.03.g-amazon-ecs-optimized
+        owner-alias: amazon
+  AMIv1:
     Type: Custom::AMI
     Properties:
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
@@ -8,6 +15,9 @@ Resources:
         name: amzn-ami-2017.03.g-amazon-ecs-optimized
         owner-alias: amazon
 Outputs:
-  AMI:
+  OldAMI:
     Description: ami
-    Value: !Ref 'AMI'
+    Value: !Ref 'AMIv1'
+  LatestAMI:
+    Description: ami
+    Value: !Ref 'AMIv2'

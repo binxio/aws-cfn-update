@@ -197,3 +197,39 @@ def test_add_new_version_partitions_multiple_versions():
         'name'] > 'amzn-ami-2016.09.a-amazon-ecs-optimized'
     assert template['Outputs']['AMI']['Ref'] == 'CustomAMIv3'
     assert template['Outputs']['BMI']['Ref'] == 'CustomBMIv1'
+
+
+def test_add_new_versions_keep_old_refs():
+    template = {
+        'Resources': {
+            'CustomAMIv2': {
+                'Type': 'Custom::AMI',
+                'Properties': {
+                    'Filters': {
+                        'name': 'amzn-ami-2013.09.b-amazon-ecs-optimized'
+                    }}},
+            'CustomAMIv1': {
+                'Type': 'Custom::AMI',
+                'Properties': {
+                    'Filters': {
+                        'name': 'amzn-ami-2013.09.a-amazon-ecs-optimized'
+                    }}},
+        },
+        'Outputs': {
+            'OldAMI': {
+                'Ref': 'CustomAMIv1'
+            },
+            'NewAMI': {
+                'Ref': 'CustomAMIv2'
+            }
+        }}
+    updater = AMIUpdater()
+    updater.template = template
+    updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
+    updater.add_new_version = True
+    updater.update_template()
+    assert updater.dirty
+    assert 'CustomAMIv3' in template['Resources']
+    assert template['Outputs']['OldAMI']['Ref'] == 'CustomAMIv1'
+    assert template['Outputs']['NewAMI']['Ref'] == 'CustomAMIv3'
+

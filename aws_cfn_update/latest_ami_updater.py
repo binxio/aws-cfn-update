@@ -12,12 +12,13 @@
 #   limitations under the License.
 #
 #   Copyright 2018 binx.io B.V.
+import copy
 import fnmatch
 import re
-import sys
-import copy
-import json
+from collections import OrderedDict
+
 import boto3
+import sys
 
 from .cfn_updater import CfnUpdater
 from .replace_references import replace_references
@@ -68,7 +69,7 @@ class AMIUpdater(CfnUpdater):
 
     By specifying --add-new-version, a new Custom::AMI will be added
     to the template with a new name. A suffix `v<version>` is appended
-    to create the new resource. Any reference to the original Custom::AMI
+    to create the new resource. Any reference to the highest Custom::AMI version
     resource is replaced. It will change:
 
 \b
@@ -79,7 +80,7 @@ class AMIUpdater(CfnUpdater):
              name: amzn-ami-2017.09.a-amazon-ecs-optimized
            Owners:
              - amazon
-      CustomAMIv2:`
+      CustomAMIv2:
          Type: Custom::AMI
          Properties:
            Filters:
@@ -89,7 +90,7 @@ class AMIUpdater(CfnUpdater):
       Instance:
          Type: AWS::EC2::Instance
          Properties:
-            ImageId: !Ref CustomAMIv2
+            ImageId: !Ref CustomAMI
 
     to:
 
@@ -187,8 +188,10 @@ class AMIUpdater(CfnUpdater):
                 partitions[base] = {}
             partitions[base][resource_name] = self.resources[resource_name]
 
+
         for base in partitions:
-            yield partitions[base]
+            resource_names = sorted(partitions[base].keys(), key=lambda n: split_resource_name(n)[1])
+            yield OrderedDict({name: partitions[base][name] for name in resource_names})
 
     @staticmethod
     def latest_custom_ami_resource(ami_resources):
@@ -241,8 +244,9 @@ class AMIUpdater(CfnUpdater):
                     new_resource_name = make_new_resource_name(resource_name)
                     self.resources[new_resource_name] = ami
                     self.update_ami(new_resource_name, ami)
-                    for old_resource_name in ami_resources:
-                        replace_references(self.template, old_resource_name, new_resource_name)
+                    for old_resource_name in reversed(ami_resources):
+                        if replace_references(self.template, old_resource_name, new_resource_name):
+                            break
 
     def update_template(self):
         if self.add_new_version:
