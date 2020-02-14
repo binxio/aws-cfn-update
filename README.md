@@ -151,7 +151,7 @@ to:
 
 By specifying --add-new-version, a new Custom::AMI will be added
 to the template with a new name. A suffix `v<version>` is appended
-to create the new resource. Any reference to the original Custom::AMI
+to create the new resource. The highest reference to the Custom::AMI
 resource is replaced. It will change:
 
 ```yaml
@@ -162,7 +162,7 @@ resource is replaced. It will change:
              name: amzn-ami-2017.09.a-amazon-ecs-optimized
            Owners:
              - amazon
-      CustomAMIv2:`
+      CustomAMIv2:
          Type: Custom::AMI
          Properties:
            Filters:
@@ -173,6 +173,9 @@ resource is replaced. It will change:
          Type: AWS::EC2::Instance
          Properties:
             ImageId: !Ref CustomAMIv2
+Outputs:
+  OldestAMI:
+    Value: !Ref CustomAMI
 ```
 to:
 
@@ -201,7 +204,10 @@ to:
       Instance:
          Type: AWS::EC2::Instance
          Properties:
-            ImageId: !Ref CustomAMIv3
+            ImageId: !Ref CustomAMIv3		# <--- updated this
+Outputs:
+  OldestAMI:
+    Value: !Ref CustomAMI			# <-- unchanged
 ```
 
 
