@@ -27,6 +27,7 @@ from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 from aws_cfn_update.lambda_inline_code_updater import LambdaInlineCodeUpdater
 from aws_cfn_update.statemachine_updater import update_state_machine_definition
 from aws_cfn_update.remove_resource import remove_resource
+from aws_cfn_update.add_new_resources import add_new_resources
 
 
 @click.group()
@@ -110,6 +111,7 @@ def lambda_body(ctx, resource, file, path):
 
 cli.add_command(update_state_machine_definition)
 cli.add_command(remove_resource)
+cli.add_command(add_new_resources)
 
 def main():
     cli()

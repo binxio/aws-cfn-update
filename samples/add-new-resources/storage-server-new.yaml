@@ -29,10 +29,20 @@ Resources:
     Type: Custom::AMI
     Properties:
       Filters:
-        name: aws-storage-gateway-1579034108
+        name: aws-storage-gateway-v1
       Owners:
         - amazon
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
+
+  StorageGatewayAMIv1:
+    Type: Custom::AMI
+    Properties:
+      Filters:
+        name: aws-storage-gateway-v2
+      Owners:
+        - amazon
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-ami-provider'
+
 
   UploadDisk:
     Type: AWS::EC2::Volume
