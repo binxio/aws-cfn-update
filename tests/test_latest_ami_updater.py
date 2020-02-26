@@ -1,3 +1,4 @@
+import pytest
 from aws_cfn_update.latest_ami_updater import AMIUpdater, make_new_resource_name
 
 

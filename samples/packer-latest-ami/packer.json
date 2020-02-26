@@ -1,0 +1,31 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "communicator": "winrm",
+      "region": "eu-central-1",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "Windows_Server-2016-English-Full-Base-2020.01.10",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "801119661308"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "m4.large",
+      "force_deregister": "true",
+      "ami_name": "windows_server_2016_english_head_node_{{user `version`}}",
+      "tags": {
+        "os_version": "windows2016",
+        "backup": "daily",
+        "Name": "Windows Server 2016 English"
+      },
+      "ami_description": "Windows Server 2016 English",
+      "winrm_username": "administrator",
+      "user_data_file": "scripts/user-data.ps1"
+    }
+  ]
+}

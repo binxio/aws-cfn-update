@@ -15,6 +15,7 @@
 import re
 from copy import copy
 from datetime import datetime
+from aws_cfn_update.packer_ami_updater import main as packer_latest_ami
 
 import click
 import click_datetime
@@ -112,6 +113,7 @@ def lambda_body(ctx, resource, file, path):
 cli.add_command(update_state_machine_definition)
 cli.add_command(remove_resource)
 cli.add_command(add_new_resources)
+cli.add_command(packer_latest_ami)
 
 def main():
     cli()
