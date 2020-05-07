@@ -105,7 +105,7 @@ class CfnUpdater(object):
         with open(self.filename, 'w') as f:
             if self.template_format == '.yaml':
                 yaml = YAML()
-                yaml.indent(mapping=2, sequence=4, offset=2)
+                yaml.indent(mapping=2, sequence=2, offset=2)
                 yaml.dump(self.template, f)
             else:
                 json.dump(self.template, f, separators=(',', ': '), indent=2)
