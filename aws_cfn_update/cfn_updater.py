@@ -81,6 +81,7 @@ class CfnUpdater(object):
                 self.template = json.load(f, object_pairs_hook=collections.OrderedDict)
             else:
                 yaml = YAML()
+                yaml.preserve_quotes = True
                 self.template = yaml.load(f)
 
     def is_cloudformation_template(self):
