@@ -1,10 +1,12 @@
-import pytest
+import json
 from aws_cfn_update.latest_ami_updater import AMIUpdater, make_new_resource_name
 
 
-def test_new_resource_name():
-    updater = AMIUpdater()
 
+
+def test_new_resource_name():
+
+    updater = stubbed_ami_updater()
     result = make_new_resource_name('WhatEverBaseAMI')
     assert result == 'WhatEverBaseAMIv1'
 
@@ -24,7 +26,7 @@ def test_ami_update_inplace():
                     'Filters': {
                         'name': 'amzn-ami-2013.09.a-amazon-ecs-optimized'
                     }}}}}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.update_template()
@@ -46,7 +48,7 @@ def test_with_other_filters():
                         'is-public': 'true'
                     },
                     'Owners': ['amazon']}}}}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.update_template()
@@ -68,7 +70,7 @@ def test_no_matching_ami_found():
                         'is-public': 'false'
                     },
                     'Owners': ['microsoft']}}}}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.update_template()
@@ -92,7 +94,7 @@ def test_add_new_version():
                 'Ref': 'CustomAMI'
             }
         }}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.add_new_version = True
@@ -130,7 +132,7 @@ def test_add_new_version_partitions():
                 'Ref': 'CustomBMI'
             }
         }}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.add_new_version = True
@@ -180,7 +182,7 @@ def test_add_new_version_partitions_multiple_versions():
                 'Ref': 'CustomBMI'
             }
         }}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.add_new_version = True
@@ -224,7 +226,7 @@ def test_add_new_versions_keep_old_refs():
                 'Ref': 'CustomAMIv2'
             }
         }}
-    updater = AMIUpdater()
+    updater = stubbed_ami_updater()
     updater.template = template
     updater.ami_name_pattern = 'amzn-ami-*ecs-optimized'
     updater.add_new_version = True
@@ -233,4 +235,20 @@ def test_add_new_versions_keep_old_refs():
     assert 'CustomAMIv3' in template['Resources']
     assert template['Outputs']['OldAMI']['Ref'] == 'CustomAMIv1'
     assert template['Outputs']['NewAMI']['Ref'] == 'CustomAMIv3'
+
+all_responses = []
+with open('dummy_responses.json', 'r') as f:
+    all_dummy_responses = json.load(f)
+
+def stubbed_ami_updater():
+    result = AMIUpdater()
+    result._describe_images = describe_images_stub
+    return result
+
+def describe_images_stub(**request):
+    result = next(filter(lambda rr: rr['request'] == request, all_dummy_responses), None)
+    if not result:
+        assert False, "no dummy response found for this request"
+    return result['response']
+
 

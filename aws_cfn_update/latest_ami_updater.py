@@ -155,9 +155,12 @@ class AMIUpdater(CfnUpdater):
         result['Filters'] = filters
         return result
 
+    def _describe_images(self, **kwargs):
+        return boto3.client('ec2').describe_images(**kwargs)
+
     def load_latest_ami_name_pattern(self, resource):
-        kwargs = self.create_describe_image_request(resource)
-        response = boto3.client('ec2').describe_images(**kwargs)
+        response = self._describe_images(**self.create_describe_image_request(resource))
+
         images = sorted(response['Images'], key=lambda i: i['CreationDate'])
         self.latest_ami_name_pattern = images[-1]['Name'] if len(images) > 0 else None
         if len(images) > 0:
