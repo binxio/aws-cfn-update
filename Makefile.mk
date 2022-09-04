@@ -33,10 +33,9 @@ pre-build:
 post-build:
 
 
-do-build: venv
-	. venv/bin/activate && python setup.py check
-	. venv/bin/activate && python setup.py build
-	. venv/bin/activate && python setup.py test
+do-build:
+	pipenv install -d
+	pipenv run python setup.py check build test
 
 .release:
 	@echo "release=0.0.0" > .release
@@ -52,8 +51,8 @@ upload: do-upload post-upload
 
 do-upload: 
 	rm -rf dist/*
-	. venv/bin/activate && python setup.py sdist
-	. venv/bin/activate && twine upload dist/*
+	pipenv shell run python setup.py sdist
+	pipenv shell run twine upload dist/*
 
 snapshot: build upload
 
@@ -95,22 +94,13 @@ check-release: .release
 	@. $(RELEASE_SUPPORT) ; tagExists $(TAG) || (echo "ERROR: version not yet tagged in git. make [minor,major,patch]-release." >&2 && exit 1) ;
 	@. $(RELEASE_SUPPORT) ; ! differsFromRelease $(TAG) || (echo "ERROR: current directory differs from tagged $(TAG). make [minor,major,patch]-release." ; exit 1)
 
-venv: 
-	virtualenv -p python3 venv  && \
-        . ./venv/bin/activate && \
-        pip --quiet install --upgrade pip  && \
-	pip install --upgrade setuptools twine
-
 clean:
 	python setup.py clean
 	rm -rf build/* dist/*  *.egg-info
 
-clobber: clean
-	rm -rf venv
-
 test: do-build
-	@. venv/bin/activate && python setup.py test
-	
+
+
 autopep:
 	autopep8 --experimental --in-place --max-line-length 132 $(shell find . -name \*.py   | grep -v -e /.eggs/ -e /venv/ -e /build/ -e /dist/)
 

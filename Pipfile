@@ -7,6 +7,8 @@ name = "pypi"
 aws_cfn_update = {editable = true, path = "."}
 
 [dev-packages]
+twine = "*"
+setuptools = "*"
 
 [requires]
 python_version = "3.9"
