@@ -1,5 +1,6 @@
+---
 name: release-to-pypi
-on:
+"on":
   push:
     tags:
       - '*'
@@ -15,9 +16,12 @@ jobs:
       - name: checkout
         run: git fetch --prune --unshallow
       - name: install environment
-        run: pip install pipenv && pipenv sync -d 
+        run: pip install pipenv
       - name: release
         run: make snapshot
         env:
           TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.twine_password }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          AWS_DEFAULT_REGION: eu-central-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
