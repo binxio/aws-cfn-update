@@ -13,6 +13,7 @@ Commands:
   lambda-inline-code        Updates the inline code of an Lambda
   rest-api-body             Updates the body of a REST API Resource
   state-machine-definition  Updates the definition of an AWS::StepFunctions::StateMachine.
+  oidc-provider-thumbprints Updates the thumbprints of AWS::IAM::OIDCProviders.
 ```
 
 # remove-resource - removes the specified resource and all referencing resources
@@ -322,6 +323,18 @@ Options:
 ```
 
 For an example, check out [./samples/state-machine-definition](./samples/state-machine-definition)
+
+# oidc-provider-thumbprints - updates the thumbprints list of an AWS::IAM::OIDCProvider.
+
+By default, it updates the thumbprints of all OIDCProviders specified  
+templates. Optionally, you can specify a specific OIDC provider.
+
+```
+Options:
+  --url TEXT  of the OIDC provider to update, or all if not specified
+  --append    append the fingerprint
+  --help      Show this message and exit.
+```
 
 # Installation
 

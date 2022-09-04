@@ -1,9 +1,13 @@
 """
 Programmatically update CloudFormation templates
 """
+from os import path
 from setuptools import find_packages, setup
 
 dependencies = ['click', 'boto3', 'cfn-flip', 'pytz', 'pytest', 'croniter', 'tzlocal', 'click-datetime', 'ruamel.yaml', 'requests', 'jsonmerge', 'cryptography']
+
+with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='aws-cfn-update',
@@ -13,7 +17,8 @@ setup(
     author='Mark van Holsteijn',
     author_email='mark@binx.io',
     description='Programmatically update CloudFormation templates',
-    long_description=__doc__,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
