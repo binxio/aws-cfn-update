@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_9" default="false" project-jdk-name="Pipenv (aws-cfn-update) (2)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_9" project-jdk-name="Pipenv (aws-cfn-update)" project-jdk-type="Python SDK" />
+  <component name="ProjectType">
+    <option name="id" value="jpab" />
+  </component>
   <component name="PythonCompatibilityInspectionAdvertiser">
     <option name="version" value="3" />
   </component>

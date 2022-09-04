@@ -11,7 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/aws_cfn_update" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (aws-cfn-update) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Pipenv (aws-cfn-update)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

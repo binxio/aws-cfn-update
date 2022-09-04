@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  GitLabCom:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://gitlab.com
+      ClientIdList:
+        - https://gitlab.com
+      ThumbprintList:
+        - 30CE9A70035945E3F7DA00C67DA608F2B7CCAECA

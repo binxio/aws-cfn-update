@@ -29,6 +29,7 @@ from aws_cfn_update.lambda_inline_code_updater import LambdaInlineCodeUpdater
 from aws_cfn_update.statemachine_updater import update_state_machine_definition
 from aws_cfn_update.remove_resource import remove_resource
 from aws_cfn_update.add_new_resources import add_new_resources
+from aws_cfn_update.oidc_provider_thumbprints_updater import update_oidc_provider_thumbprint
 
 
 @click.group()
@@ -114,6 +115,7 @@ cli.add_command(update_state_machine_definition)
 cli.add_command(remove_resource)
 cli.add_command(add_new_resources)
 cli.add_command(packer_latest_ami)
+cli.add_command(update_oidc_provider_thumbprint)
 
 def main():
     cli()
