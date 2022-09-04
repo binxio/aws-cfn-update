@@ -17,7 +17,7 @@ jobs:
       - name: install environment
         run: pip install pipenv && pipenv sync -d 
       - name: release
-        run: make upload-dist
+        run: make snapshot
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.twine_password }}
