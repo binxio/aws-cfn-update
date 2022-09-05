@@ -12,7 +12,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'), encoding
 setup(
     name='aws-cfn-update',
     version="0.6.2",
-    url='https://github.com/mvanholsteijn/aws-cfn-update',
+    url='https://github.com/binxio/aws-cfn-update',
     license='BSD',
     author='Mark van Holsteijn',
     author_email='mark@binx.io',
