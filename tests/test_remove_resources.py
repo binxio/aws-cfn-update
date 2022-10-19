@@ -65,6 +65,9 @@ Resources:
     Type: Custom::AMI
   EC2Instance:
     ImageId: !Ref AMI
+Outputs:
+  Arn:    
+     Value: !GetAtt AMI.Arn
 """
     )
 
@@ -73,6 +76,8 @@ Resources:
     resources = template.get("Resources")
     assert resources.get("AMI") is None
     assert resources.get("EC2Instance") is None
+    outputs = template.get("Outputs")
+    assert outputs.get("Arn") is None
 
 
 def test_yaml_simple_getatt():

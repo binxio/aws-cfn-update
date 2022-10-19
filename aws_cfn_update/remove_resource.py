@@ -40,9 +40,11 @@ def references_in_sub(sub, name):
 def is_tag_reference(obj, name):
     if isinstance(obj, TaggedScalar):
         if obj.tag.value == '!Ref':
-            return obj.value == name
+            return str(obj.value) == name
         elif obj.tag.value == '!Sub':
             return references_in_sub(obj.value, name)
+        elif obj.tag.value == '!GetAtt':
+            return str(obj.value).split('.')[0] == name
     elif isinstance(obj, CommentedSeq):
         if obj.tag.value == '!GetAtt':
             return len(obj) > 1 and obj[0] == name
@@ -54,6 +56,12 @@ def remove_resource_from_template(template:dict, name:str):
         resources.pop(name)
         remove_all_references(template, name)
         return True
+    outputs:dict = template.get("Resources")
+    if outputs and name in outputs:
+        remove_all_references(template, name)
+        return True
+    return False
+
     return False
 
 def remove_all_references(template, name):
