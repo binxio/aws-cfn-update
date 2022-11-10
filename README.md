@@ -6,14 +6,15 @@ a CloudFormation template. Note that formatting and comments may be lost.
 Commands:
 ```
   container-image           Updates the Docker image of ECS Container Task definition
+  config-rule-inline-code   Updates the inline code of an AWS::Config::ConfigRule resource
   latest-ami                Updates the AMI name of Custom::AMI resources
   cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources
   remove-resource           Removes the specified CloudFormation resource
-  add-new-resources         add new resources that exist in the new template
+  add-new-resources         Add new resources that exist in the new template
   lambda-inline-code        Updates the inline code of an Lambda
   rest-api-body             Updates the body of a REST API Resource
-  state-machine-definition  Updates the definition of an AWS::StepFunctions::StateMachine.
-  oidc-provider-thumbprints Updates the thumbprints of AWS::IAM::OIDCProviders.
+  state-machine-definition  Updates the definition of an AWS::StepFunctions::StateMachine
+  oidc-provider-thumbprints Updates the thumbprints of AWS::IAM::OIDCProviders
 ```
 
 # remove-resource - removes the specified resource and all referencing resources
