@@ -26,7 +26,7 @@ will update:
 
 ```yaml
 Resources:
-  AMI: 
+  AMI:
     Type: Custom::AMI
   EC2Instance:
     ImageId: !Ref AMI
@@ -51,9 +51,9 @@ Parameters:
   Vpc:
     Type: String
 Resources:
-  AMI: 
+  AMI:
     Type: Custom::AMI
-  AMIv2: 
+  AMIv2:
     Type: Custom::AMI
   EC2Instance:
     ImageId: !Ref AMI
@@ -67,7 +67,7 @@ will update old.yaml:
 
 ```yaml
 Resources:
-  AMI: 
+  AMI:
     Type: Custom::AMI
   EC2Instance:
     ImageId: !Ref AMI
@@ -80,9 +80,9 @@ Parameters:
   Vpc:
     Type: String
 Resources:
-  AMI: 
+  AMI:
     Type: Custom::AMI
-  AMIv2: 
+  AMIv2:
     Type: Custom::AMI
   EC2Instance:
     ImageId: !Ref AMI
@@ -91,7 +91,7 @@ Resources:
 
 # container-image - Updates the Docker image of ECS Container Definitions.
 
-will update any container definition where the base image name matches the specified image name 
+will update any container definition where the base image name matches the specified image name
 excluding the tag. For example, the command:
 ```
 aws-cfn-update container-image --image mvanholsteijn/paas-monitor:0.6.0
@@ -120,15 +120,15 @@ to::
 
 # latest-ami - Updates the AMI name of Custom::AMI resources
 
-will update the AMI name of [Custom::AMI](https://github.com/binxio/cfn-ami-provider) resources to the latest version.  
+will update the AMI name of [Custom::AMI](https://github.com/binxio/cfn-ami-provider) resources to the latest version.
 
-For example, the command: 
+For example, the command:
 
 ```
 aws-cfn-update latest-ami --ami-name-pattern 'amzn-ami-*ecs-optimized'
 ```
 
-Updates the AMI name of Custom::AMI resources to the latest version. 
+Updates the AMI name of Custom::AMI resources to the latest version.
 It will update the following resource definition from:
 
 ```yaml
@@ -281,7 +281,7 @@ Options:
 
 # lambda-inline-code - updates the inline code of an AWS::Lambda::Function resource.
 
-Update the inline code of a AWS::Lambda::Function to include the content of the
+Update the inline code of an AWS::Lambda::Function to include the content of the
 specified file.  It changes:
 
 ```
@@ -301,6 +301,38 @@ into:
             ELB = boto3.client('elbv2')
             ...
         Function: cfn-listener-rule-provider
+```
+
+# config-rule-inline-code - updates the inline code of an AWS::Config::ConfigRule resource.
+
+Update the inline code of an AWS::Config::ConfigRule to include the content of the
+specified file. It changes:
+
+```
+    ConfigRule:
+      Type: AWS::Config::ConfigRule
+      Properties:
+        Source:
+          Owner: CUSTOM_POLICY
+          CustomPolicyDetails:
+            EnableDebugLogDelivery: true
+            PolicyRuntime: guard-2.x.x
+```
+into:
+```
+    ConfigRule:
+        Type: AWS::Config::ConfigRule
+        Properties:
+          Source:
+            Owner: CUSTOM_POLICY
+            CustomPolicyDetails:
+              EnableDebugLogDelivery: true
+              PolicyRuntime: guard-2.x.x
+              PolicyText: |-
+                rule name when resourceType == "AWS::S3::Bucket" {
+                    ...
+                }
+              ...
 ```
 
 # state-machine-definition - updates the definition string of an AWS::StepFunctions::StateMachine
@@ -326,7 +358,7 @@ For an example, check out [./samples/state-machine-definition](./samples/state-m
 
 # oidc-provider-thumbprints - updates the thumbprints list of an AWS::IAM::OIDCProvider.
 
-By default, it updates the thumbprints of all OIDCProviders specified  
+By default, it updates the thumbprints of all OIDCProviders specified
 templates. Optionally, you can specify a specific OIDC provider.
 
 ```

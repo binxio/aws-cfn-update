@@ -21,6 +21,7 @@ import click
 import click_datetime
 import pytz
 
+from aws_cfn_update.config_rule_inline_code_updater import ConfigRuleInlineCodeUpdater
 from aws_cfn_update.container_image_updater import ContainerImageUpdater
 from aws_cfn_update.cron_schedule_expression_updater import CronScheduleExpressionUpdater
 from aws_cfn_update.latest_ami_updater import AMIUpdater
@@ -111,6 +112,20 @@ def lambda_body(ctx, resource, file, path):
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
 
+
+@cli.command(name='config-rule-inline-code', help=ConfigRuleInlineCodeUpdater.__doc__)
+@click.option('--resource', required=True, help='name of the AWS::Config::ConfigRule')
+@click.option('--file', required=True, type=click.Path(exists=True), help='containing the source')
+@click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
+@click.pass_context
+def config_rule_body(ctx, resource, file, path):
+    updater = LambdaInlineCodeUpdater()
+
+    with open(file, 'r') as f:
+        body = f.read()
+    updater.main(resource, body, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
+
+
 cli.add_command(update_state_machine_definition)
 cli.add_command(remove_resource)
 cli.add_command(add_new_resources)
@@ -119,7 +134,6 @@ cli.add_command(update_oidc_provider_thumbprint)
 
 def main():
     cli()
-
 
 
 if __name__ == '__main__':
