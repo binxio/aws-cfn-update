@@ -47,7 +47,7 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
 
     def update_template(self):
         """
-        updates the Code property of a AWS::Lambda::Function resource of name `self.resource` to `self.code`
+        updates the Code property of a AWS::Config::ConfigRule resource of name `self.resource` to `self.code`
         """
         resource = self.template.get('Resources', {}).get(self.resource, None)
         if resource and resource['Type'] == 'AWS::Config::ConfigRule':
@@ -70,7 +70,7 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
                 self.dirty = True
         elif resource:
             sys.stderr.write(
-                'WARN: resource {} in {} is not of type AWS::Lambda::Function\n'.format(self.resource, self.filename))
+                'WARN: resource {} in {} is not of type AWS::Config::ConfigRule\n'.format(self.resource, self.filename))
 
     def main(self, resource, code, paths, dry_run, verbose):
         self.resource = resource
