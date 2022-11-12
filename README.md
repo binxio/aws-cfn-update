@@ -19,7 +19,7 @@ Commands:
 
 # remove-resource - removes the specified resource and all referencing resources
 
-will remove the specified resource and all of the references. For example, the command:
+will remove the specified resource and all the references. For example, the command:
 ```
 aws-cfn-update remove-resource --resource AMI .
 ```

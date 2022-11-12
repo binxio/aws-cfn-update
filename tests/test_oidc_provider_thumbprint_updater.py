@@ -36,7 +36,7 @@ _multiple_oidc_providers = {
 }
 
 
-@pytest.mark.parametrize('verbose_mode', [True, False])
+@pytest.mark.parametrize("verbose_mode", [True, False])
 def test_replace(verbose_mode):
     updater = OIDCProviderThumbprintsUpdater()
     updater.template = json.loads(json.dumps(_single_oidc_provider))
@@ -62,7 +62,7 @@ def test_replace(verbose_mode):
     assert fingerprint == thumbprints[0]
 
 
-@pytest.mark.parametrize('verbose_mode', [True, False])
+@pytest.mark.parametrize("verbose_mode", [True, False])
 def test_append(verbose_mode):
     updater = OIDCProviderThumbprintsUpdater()
     updater.template = json.loads(json.dumps(_single_oidc_provider))
@@ -89,7 +89,7 @@ def test_append(verbose_mode):
     assert fingerprint == thumbprints[-1]
 
 
-@pytest.mark.parametrize('verbose_mode', [True, False])
+@pytest.mark.parametrize("verbose_mode", [True, False])
 def test_single(verbose_mode):
     updater = OIDCProviderThumbprintsUpdater()
     updater.template = json.loads(json.dumps(_single_oidc_provider))
@@ -117,7 +117,7 @@ def test_single(verbose_mode):
     assert fingerprint != "DEADBEEF"
 
 
-@pytest.mark.parametrize('verbose_mode', [True, False])
+@pytest.mark.parametrize("verbose_mode", [True, False])
 def test_update_all(verbose_mode):
     updater = OIDCProviderThumbprintsUpdater()
     updater.template = json.loads(json.dumps(_multiple_oidc_providers))

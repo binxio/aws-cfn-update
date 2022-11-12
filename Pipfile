@@ -9,6 +9,7 @@ aws_cfn_update = {editable = true, path = "."}
 [dev-packages]
 twine = "*"
 setuptools = "*"
+"botocore-stubber-recorder" = ">=0.4.3"
 
 [requires]
 python_version = "3.9"
