@@ -119,7 +119,7 @@ def lambda_body(ctx, resource, file, path):
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def config_rule_body(ctx, resource, file, path):
-    updater = LambdaInlineCodeUpdater()
+    updater = ConfigRuleInlineCodeUpdater()
 
     with open(file, 'r') as f:
         body = f.read()
