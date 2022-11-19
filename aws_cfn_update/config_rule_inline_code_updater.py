@@ -66,7 +66,7 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
                 if 'CustomPolicyDetails' not in resource['Properties']['Source']:
                     resource['Properties']['Source']['CustomPolicyDetails'] = {}
 
-                resource['Properties']['Source']['CustomPolicyDetails'] = {'PolicyText': PreservedScalarString(self.code)}
+                resource['Properties']['Source']['CustomPolicyDetails']['PolicyText'] = PreservedScalarString(self.code)
                 self.dirty = True
         elif resource:
             sys.stderr.write(
