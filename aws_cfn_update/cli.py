@@ -70,7 +70,7 @@ def ami_image_update(ctx, ami_name_pattern, add_new_version, path):
 
 @cli.command(name='cron-schedule-expression', help=CronScheduleExpressionUpdater.__doc__)
 @click.option('--timezone', required=False, help='to use to calculate the UTC time', default="Europe/Amsterdam")
-@click.option('--date', type=click.DateTime(formats='%Y-%m-%d'), default=datetime.now(),
+@click.option('--date', type=click.DateTime(), default=datetime.now(),
               help='to use as reference date')
 @click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
