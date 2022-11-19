@@ -44,13 +44,19 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
     def __init__(self):
         super(ConfigRuleInlineCodeUpdater, self).__init__()
         self._image = []
+        self.resource_name = None
+        self.code = None
 
     def update_template(self):
         """
         updates the Code property of a AWS::Config::ConfigRule resource of name `self.resource` to `self.code`
         """
-        resource = self.template.get('Resources', {}).get(self.resource, None)
-        if resource and resource['Type'] == 'AWS::Config::ConfigRule':
+        resource = self.template.get('Resources', {}).get(self.resource_name, None)
+        if (
+                resource
+                and resource["Type"] == "AWS::Config::ConfigRule"
+                and resource.get("Owner", "CUSTOM_POLICY") == "CUSTOM_POLICY"
+        ):
             properties = resource.get('Properties', {})
             source = properties.get('Source', {})
             details = source.get('CustomPolicyDetails', {})
@@ -58,9 +64,11 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
 
             if old_code != self.code:
                 sys.stderr.write(
-                    'INFO: updating inline code of lambda {} in {}\n'.format(self.resource, self.filename))
+                    'INFO: updating policy text of config rule {} in {}\n'.format(self.resource_name, self.filename))
                 if 'Properties' not in resource:
                     resource['Properties'] = {}
+                if 'Owner' not in resource['Properties']:
+                    resource['Properties']['Owner'] = 'CUSTOM_POLICY'
                 if 'Source' not in resource['Properties']:
                     resource['Properties']['Source'] = {}
                 if 'CustomPolicyDetails' not in resource['Properties']['Source']:
@@ -70,10 +78,10 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
                 self.dirty = True
         elif resource:
             sys.stderr.write(
-                'WARN: resource {} in {} is not of type AWS::Config::ConfigRule\n'.format(self.resource, self.filename))
+                'WARN: resource {} in {} is not a CUSTOM_POLICY of type AWS::Config::ConfigRule\n'.format(self.resource_name, self.filename))
 
     def main(self, resource, code, paths, dry_run, verbose):
-        self.resource = resource
+        self.resource_name = resource
         self.code = code
         self.dry_run = dry_run
         self.verbose = verbose

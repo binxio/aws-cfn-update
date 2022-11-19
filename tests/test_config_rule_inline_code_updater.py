@@ -23,7 +23,7 @@ sample = {
 
 def test_add_body():
     updater = Updater()
-    updater.resource = "ConfigRule"
+    updater.resource_name = "ConfigRule"
     updater.code = 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
     updater.template = sample.copy()
 
@@ -47,7 +47,7 @@ def test_add_body():
 
 def test_replace_body():
     updater = Updater()
-    updater.resource = "ConfigRule"
+    updater.resource_name = "ConfigRule"
     updater.code = 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
     updater.template = sample.copy()
     updater.template["Resources"]["ConfigRule"]["Properties"]["Source"]["CustomPolicyDetails"]["PolicyText"] = "Existing Policy"
@@ -76,7 +76,7 @@ skip_body_sample = {"Resources": {"ConfigRule": {"Type": "AWS::EC2::Instance"}}}
 
 def test_skip_body():
     updater = Updater()
-    updater.resource = "ConfigRule"
+    updater.resource_name = "ConfigRule"
     updater.code = 'print("hello world!")'
     updater.template = skip_body_sample.copy()
 
