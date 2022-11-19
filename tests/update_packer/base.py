@@ -16,7 +16,9 @@ class UpdatePackerUnitTestBase(unittest.TestCase):
         """
         add stubs for all AWS API calls
         """
-        self.session = botocore.session.get_session()
+        self.session = botocore.session.get_session(
+            {"region": ('region', 'AWS_DEFAULT_REGION','eu-central-1', None)}
+        )
         self.clients = {
             service: self.session.create_client(service) for service in ["ec2"]
         }

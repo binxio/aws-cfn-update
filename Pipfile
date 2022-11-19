@@ -6,10 +6,12 @@ name = "pypi"
 [packages]
 aws_cfn_update = {editable = true, path = "."}
 
-[dev-packages]
-twine = "*"
-setuptools = "*"
-"botocore-stubber-recorder" = ">=0.4.3"
-
 [requires]
 python_version = "3.9"
+
+[dev-packages]
+setuptools_scm = "*"
+tox = "*"
+build = "*"
+twine = "*"
+aws-cfn-update = {path = "."}

@@ -3,4 +3,5 @@ NAME=aws-cfn-update
 
 
 test:
-	PYTHONPATH=tests pipenv run which pytest
+	pipenv run tox testenv
+

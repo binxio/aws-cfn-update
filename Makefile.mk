@@ -35,7 +35,8 @@ post-build:
 
 do-build:
 	pipenv install -d
-	PYTHONPATH=tests pipenv run python setup.py check build test
+	tox testenv
+	python -m build
 
 .release:
 	@echo "release=0.0.0" > .release
