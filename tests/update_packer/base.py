@@ -8,7 +8,7 @@ import unittest
 import botocore.session
 from botocore.stub import Stubber
 
-from update_packer import call_00001_describe_images
+from tests.update_packer import call_00001_describe_images
 
 
 class UpdatePackerUnitTestBase(unittest.TestCase):

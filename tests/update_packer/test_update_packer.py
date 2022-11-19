@@ -3,7 +3,7 @@ update_packer unit test.
 """
 import boto3
 import unittest
-from update_packer.base import UpdatePackerUnitTestBase
+from tests.update_packer.base import UpdatePackerUnitTestBase
 from aws_cfn_update.packer_ami_updater import PackerAMIUpdater
 
 
