@@ -10,4 +10,10 @@ build/
 *.egg-info/
 
 .tox/
-.coverage
+.coverage/
+target/
+dist/
+.pytest_cache/
+.mypy_cache/
+.mypy_cache
+
