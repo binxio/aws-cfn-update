@@ -307,8 +307,12 @@ into:
 # config-rule-inline-code - updates the inline code of an AWS::Config::ConfigRule resource.
 
 Update the inline code of an AWS::Config::ConfigRule to include the content of the
-specified file. It changes:
+specified file. When executing:
 
+```shell
+aws-cfn-update config-rule-inline-code --resource ConfigRule --file ./rules/my-rule.guard template.yaml
+```
+It changes:
 ```
     ConfigRule:
       Type: AWS::Config::ConfigRule
@@ -322,18 +326,18 @@ specified file. It changes:
 into:
 ```
     ConfigRule:
-        Type: AWS::Config::ConfigRule
-        Properties:
-          Source:
-            Owner: CUSTOM_POLICY
-            CustomPolicyDetails:
-              EnableDebugLogDelivery: true
-              PolicyRuntime: guard-2.x.x
-              PolicyText: |-
-                rule name when resourceType == "AWS::S3::Bucket" {
-                    ...
-                }
-              ...
+      Type: AWS::Config::ConfigRule
+      Properties:
+        Source:
+          Owner: CUSTOM_POLICY
+          CustomPolicyDetails:
+            EnableDebugLogDelivery: true
+            PolicyRuntime: guard-2.x.x
+            PolicyText: |
+              rule name when resourceType == "AWS::S3::Bucket" {
+                  ...
+              }
+            ...
 ```
 
 # state-machine-definition - updates the definition string of an AWS::StepFunctions::StateMachine

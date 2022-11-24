@@ -11,6 +11,7 @@ sample = {
             "Type": "AWS::Config::ConfigRule",
             "Properties": {
                 "Source": {
+                    "Owner": "CUSTOM_POLICY",
                     "CustomPolicyDetails": {
                         "EnableDebugLogDelivery": "true",
                         "PolicyRuntime": "guard-2.x.x"
@@ -38,6 +39,7 @@ def test_add_body():
         in source
     )
 
+    assert ("CUSTOM_POLICY" == source["Owner"])
     assert ("true" == source["CustomPolicyDetails"]["EnableDebugLogDelivery"])
     assert ("guard-2.x.x" in source["CustomPolicyDetails"]["PolicyRuntime"])
 
@@ -63,6 +65,7 @@ def test_replace_body():
         in source
     )
 
+    assert ("CUSTOM_POLICY" == source["Owner"])
     assert ("true" == source["CustomPolicyDetails"]["EnableDebugLogDelivery"])
     assert ("guard-2.x.x" in source["CustomPolicyDetails"]["PolicyRuntime"])
 
