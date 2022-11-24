@@ -24,6 +24,9 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
 \b
   ConfigRule:
     Type: AWS::Config::ConfigRule
+    Properties:
+      Source:
+        Owner: CUSTOM_POLICY
 
 \b
   ConfigRule:
@@ -52,12 +55,12 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
         updates the Code property of a AWS::Config::ConfigRule resource of name `self.resource` to `self.code`
         """
         resource = self.template.get('Resources', {}).get(self.resource_name, None)
+        properties = resource.get('Properties', {})
         if (
                 resource
                 and resource["Type"] == "AWS::Config::ConfigRule"
-                and resource.get("Owner", "CUSTOM_POLICY") == "CUSTOM_POLICY"
+                and properties.get("Source", {}).get("Owner") == "CUSTOM_POLICY"
         ):
-            properties = resource.get('Properties', {})
             source = properties.get('Source', {})
             details = source.get('CustomPolicyDetails', {})
             old_code = details.get('PolicyText', None)
@@ -67,8 +70,6 @@ class ConfigRuleInlineCodeUpdater(CfnUpdater):
                     'INFO: updating policy text of config rule {} in {}\n'.format(self.resource_name, self.filename))
                 if 'Properties' not in resource:
                     resource['Properties'] = {}
-                if 'Owner' not in resource['Properties']:
-                    resource['Properties']['Owner'] = 'CUSTOM_POLICY'
                 if 'Source' not in resource['Properties']:
                     resource['Properties']['Source'] = {}
                 if 'CustomPolicyDetails' not in resource['Properties']['Source']:
