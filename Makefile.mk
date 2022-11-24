@@ -96,8 +96,7 @@ check-release: .release
 	@. $(RELEASE_SUPPORT) ; ! differsFromRelease $(TAG) || (echo "ERROR: current directory differs from tagged $(TAG). make [minor,major,patch]-release." ; exit 1)
 
 clean:
-	python setup.py clean
-	rm -rf build/* dist/*  *.egg-info
+	git clean -x -f -d  
 
 test: do-build
 
