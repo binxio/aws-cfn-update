@@ -52,7 +52,7 @@ upload: do-upload post-upload
 
 do-upload: 
 	rm -rf dist/*
-	pipenv run python setup.py sdist
+	pipenv run python -m build
 	pipenv run twine upload --non-interactive dist/*
 
 snapshot: build upload
