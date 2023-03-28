@@ -2,6 +2,8 @@
 .eggs/
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/jpa-buddy.xml
+.idea/php.xml
 venv/
 *.pyc
 
