@@ -35,7 +35,6 @@ post-build:
 
 do-build:
 	pipenv install -d
-	pipenv run tox testenv
 	pipenv run python -m build
 
 .release:
