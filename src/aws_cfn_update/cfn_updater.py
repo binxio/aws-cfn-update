@@ -80,7 +80,7 @@ class CfnUpdater(object):
             if self.template_format == '.json':
                 self.template = json.load(f, object_pairs_hook=collections.OrderedDict)
             else:
-                yaml = YAML()
+                yaml = YAML(typ='rt')
                 yaml.preserve_quotes = True
                 self.template = yaml.load(f)
 
