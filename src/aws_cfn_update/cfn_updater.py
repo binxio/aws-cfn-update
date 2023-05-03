@@ -82,6 +82,7 @@ class CfnUpdater(object):
             else:
                 yaml = YAML(typ='rt')
                 yaml.preserve_quotes = True
+                yaml.explicit_start = True
                 self.template = yaml.load(f)
 
     def is_cloudformation_template(self):
@@ -106,6 +107,7 @@ class CfnUpdater(object):
         with open(self.filename, 'w') as f:
             if self.template_format == '.yaml':
                 yaml = YAML()
+                yaml.explicit_start = True
                 yaml.indent(mapping=2, sequence=4, offset=2)
                 yaml.dump(self.template, f)
             else:
