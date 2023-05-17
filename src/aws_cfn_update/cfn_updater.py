@@ -83,6 +83,7 @@ class CfnUpdater(object):
                 yaml = YAML(typ='rt')
                 yaml.preserve_quotes = True
                 yaml.explicit_start = True
+                yaml.width = 4096
                 self.template = yaml.load(f)
 
     def is_cloudformation_template(self):
