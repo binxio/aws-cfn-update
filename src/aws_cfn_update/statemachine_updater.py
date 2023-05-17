@@ -31,6 +31,7 @@ class StateMachineDefinitionUpdater(CfnUpdater):
     If you do not want substitution for your definition, specify --no-fn-sub.
 
     """
+
     def __init__(self):
         super(StateMachineDefinitionUpdater, self).__init__()
         self.resource_name = None
@@ -43,7 +44,9 @@ class StateMachineDefinitionUpdater(CfnUpdater):
 
     def new_value(self, definition):
         if self.with_fn_sub:
-            return isinstance(definition, dict) and definition.get('Fn::Sub') == self.definition, {'Fn::Sub': self.definition}
+            return isinstance(definition, dict) and definition.get(
+                "Fn::Sub"
+            ) == self.definition, {"Fn::Sub": self.definition}
         else:
             return definition == self.definition, self.definition
 
@@ -51,20 +54,32 @@ class StateMachineDefinitionUpdater(CfnUpdater):
         """
         updates the Definition of Step Function StateMachine.
         """
-        resources = self.template.get('Resources', {})
-        for name, resource in map(lambda n: (n, resources[n]), filter(lambda n: n == self.resource_name, resources)):
-            if 'Properties' not in resource:
-                resource['Properties'] = {}
+        resources = self.template.get("Resources", {})
+        for name, resource in map(
+            lambda n: (n, resources[n]),
+            filter(lambda n: n == self.resource_name, resources),
+        ):
+            if "Properties" not in resource:
+                resource["Properties"] = {}
 
-            same, new_definition = self.new_value(resource['Properties'].get('DefinitionString'))
+            same, new_definition = self.new_value(
+                resource["Properties"].get("DefinitionString")
+            )
             if not same:
-                sys.stderr.write('INFO: updating definition of state machine {}\n'.format(self.resource_name))
-                resource['Properties']['DefinitionString'] = new_definition
+                sys.stderr.write(
+                    "INFO: updating definition of state machine {}\n".format(
+                        self.resource_name
+                    )
+                )
+                resource["Properties"]["DefinitionString"] = new_definition
                 self.dirty = True
             else:
                 if self.verbose:
                     sys.stderr.write(
-                        'INFO: no changes to definition of state machine {}\n'.format(self.resource_name))
+                        "INFO: no changes to definition of state machine {}\n".format(
+                            self.resource_name
+                        )
+                    )
 
     @property
     def definition(self):
@@ -72,11 +87,15 @@ class StateMachineDefinitionUpdater(CfnUpdater):
 
     @definition.setter
     def definition(self, definition):
-        self._definition = LiteralScalarString(definition) if not isinstance(definition, LiteralScalarString) else definition
+        self._definition = (
+            LiteralScalarString(definition)
+            if not isinstance(definition, LiteralScalarString)
+            else definition
+        )
 
     def read_definition(self, filename):
         self.definition_file = filename
-        with open(self.definition_file, 'r') as f:
+        with open(self.definition_file, "r") as f:
             self.definition = LiteralScalarString(f.read())
 
     def main(self, resource_name, definition_file, with_fn_sub, path, dry_run, verbose):
@@ -88,12 +107,27 @@ class StateMachineDefinitionUpdater(CfnUpdater):
         self.update(path)
 
 
-@click.command(name='state-machine-definition', help=StateMachineDefinitionUpdater.__doc__)
-@click.option('--resource', required=True, help='AWS::StepFunctions::StateMachine definition to update')
-@click.option('--definition', required=True, type=click.Path(exists=True), help='of the state machine')
-@click.option('--fn-sub/--no-fn-sub', required=False, default=True, help='for the definition')
-@click.argument('path', nargs=-1, required=True, type=click.Path(exists=True))
+@click.command(
+    name="state-machine-definition", help=StateMachineDefinitionUpdater.__doc__
+)
+@click.option(
+    "--resource",
+    required=True,
+    help="AWS::StepFunctions::StateMachine definition to update",
+)
+@click.option(
+    "--definition",
+    required=True,
+    type=click.Path(exists=True),
+    help="of the state machine",
+)
+@click.option(
+    "--fn-sub/--no-fn-sub", required=False, default=True, help="for the definition"
+)
+@click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def update_state_machine_definition(ctx, resource, definition, fn_sub, path):
     updater = StateMachineDefinitionUpdater()
-    updater.main(resource, definition, fn_sub, list(path), ctx.obj['dry_run'], ctx.obj['verbose'])
+    updater.main(
+        resource, definition, fn_sub, list(path), ctx.obj["dry_run"], ctx.obj["verbose"]
+    )

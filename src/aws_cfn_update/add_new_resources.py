@@ -25,19 +25,24 @@ class AddNewResources(CfnUpdater):
 
     def __init__(self):
         super(AddNewResources, self).__init__()
-        self.source:dict = {}
+        self.source: dict = {}
 
     def update_template(self):
         self.dirty = add_missing_resources(self.template, self.source)
 
 
-@click.command(name='add-new-resources', help=AddNewResources.__doc__)
-@click.option('--source', required=True, help='template to add resources from', type=click.Path(exists=True))
-@click.argument('path', nargs=1, required=True, type=click.Path(exists=True))
+@click.command(name="add-new-resources", help=AddNewResources.__doc__)
+@click.option(
+    "--source",
+    required=True,
+    help="template to add resources from",
+    type=click.Path(exists=True),
+)
+@click.argument("path", nargs=1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def add_new_resources(ctx, source, path):
     updater = AddNewResources()
-    updater.dry_run = ctx.obj['dry_run']
-    updater.verbose = ctx.obj['verbose']
+    updater.dry_run = ctx.obj["dry_run"]
+    updater.verbose = ctx.obj["verbose"]
     updater.source = read_template(source)
     updater.update(path)

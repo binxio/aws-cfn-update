@@ -9,29 +9,29 @@ import sys
 
 class PackerAMIUpdater(object):
     """
-    Updates a packer.json source_ami_filter to the latest AMI version.
-    With an ami-name-pattern of `Windows_Server-2016-English-Full-Base-*` it will
-    update the following from:
-\b
-      "source_ami_filter": {
-        "filters": {
-          "virtualization-type": "hvm",
-          "name": ""Windows_Server-2016-English-Full-Base-2020.01.15",
-          "root-device-type": "ebs"
-        },
-        "owners": [ "801119661308" ],
-      },
-\b
-    to:
-\b
-      "source_ami_filter": {
-        "filters": {
-          "virtualization-type": "hvm",
-          "name": "Windows_Server-2016-English-Full-Base-2020.02.12",
-          "root-device-type": "ebs"l
-        },
-        "owners": [ "801119661308" ],
-      },
+        Updates a packer.json source_ami_filter to the latest AMI version.
+        With an ami-name-pattern of `Windows_Server-2016-English-Full-Base-*` it will
+        update the following from:
+    \b
+          "source_ami_filter": {
+            "filters": {
+              "virtualization-type": "hvm",
+              "name": ""Windows_Server-2016-English-Full-Base-2020.01.15",
+              "root-device-type": "ebs"
+            },
+            "owners": [ "801119661308" ],
+          },
+    \b
+        to:
+    \b
+          "source_ami_filter": {
+            "filters": {
+              "virtualization-type": "hvm",
+              "name": "Windows_Server-2016-English-Full-Base-2020.02.12",
+              "root-device-type": "ebs"l
+            },
+            "owners": [ "801119661308" ],
+          },
     """
 
     def __init__(self):

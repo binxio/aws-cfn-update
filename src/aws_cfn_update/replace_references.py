@@ -9,14 +9,22 @@ def replace_references(template, old_reference, new_reference) -> bool:
     result = False
     if isinstance(template, dict):
         for name, value in template.items():
-            if name == 'Ref' and value == old_reference:
-                template['Ref'] = new_reference
+            if name == "Ref" and value == old_reference:
+                template["Ref"] = new_reference
                 result = True
-            elif isinstance(value, TaggedScalar) and value.tag and value.tag.value == '!Ref' and value.value == old_reference:
+            elif (
+                isinstance(value, TaggedScalar)
+                and value.tag
+                and value.tag.value == "!Ref"
+                and value.value == old_reference
+            ):
                 value.value = new_reference
                 result = True
             else:
-                result = replace_references(template[name], old_reference, new_reference) or result
+                result = (
+                    replace_references(template[name], old_reference, new_reference)
+                    or result
+                )
     elif isinstance(template, list):
         for i, value in enumerate(template):
             result = replace_references(value, old_reference, new_reference) or result

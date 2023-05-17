@@ -59,9 +59,9 @@ class RestAPIBodyUpdater(CfnUpdater):
         self._body = {}
 
     def load_and_merge_swagger_body(self):
-        with open(self.open_api_specification, 'r') as f:
+        with open(self.open_api_specification, "r") as f:
             body = self.yaml.load(f)
-        with open(self.api_gateway_extensions, 'r') as f:
+        with open(self.api_gateway_extensions, "r") as f:
             extensions = self.yaml.load(f)
 
         self.body = jsonmerge.merge(body, extensions)
@@ -73,7 +73,7 @@ class RestAPIBodyUpdater(CfnUpdater):
     @body.setter
     def body(self, body):
         self._body = body
-        self.body_as_string = self.yaml_dump_to_str(self.body) if body else ''
+        self.body_as_string = self.yaml_dump_to_str(self.body) if body else ""
 
     def yaml_dump_to_str(self, dict):
         s = StringIO()
@@ -81,7 +81,9 @@ class RestAPIBodyUpdater(CfnUpdater):
         return s.getvalue()
 
     def resource_name_pattern(self):
-        return re.compile('^(?P<basename>{})(v(?P<version>[0-9]+))?$'.format(self.resource_name))
+        return re.compile(
+            "^(?P<basename>{})(v(?P<version>[0-9]+))?$".format(self.resource_name)
+        )
 
     def find_matching_resources(self):
         """
@@ -90,18 +92,26 @@ class RestAPIBodyUpdater(CfnUpdater):
         pattern = self.resource_name_pattern()
 
         result = []
-        resources = self.template['Resources'] if 'Resources' in self.template else None
+        resources = self.template["Resources"] if "Resources" in self.template else None
         if resources:
-            result = list(filter(lambda name: 'Type' in resources[name] and resources[name][
-                'Type'] == 'AWS::ApiGateway::RestApi', filter(lambda name: pattern.match(name), resources)))
+            result = list(
+                filter(
+                    lambda name: "Type" in resources[name]
+                    and resources[name]["Type"] == "AWS::ApiGateway::RestApi",
+                    filter(lambda name: pattern.match(name), resources),
+                )
+            )
             result.sort(
-                key=lambda n: int(pattern.match(n).group('version')) if pattern.match(n).group('version') else -1)
+                key=lambda n: int(pattern.match(n).group("version"))
+                if pattern.match(n).group("version")
+                else -1
+            )
         return result
 
     def new_resource_name(self, name):
         match = self.resource_name_pattern().match(name)
-        version = int(match.group('version')) if match.group('version') else 0
-        return '{}v{}'.format(match.group('basename'), version + 1)
+        version = int(match.group("version")) if match.group("version") else 0
+        return "{}v{}".format(match.group("basename"), version + 1)
 
     def copy_resource(self, resource):
         """
@@ -119,47 +129,72 @@ class RestAPIBodyUpdater(CfnUpdater):
             return
 
         name = resources[-1]
-        rest_api_gateway = self.template['Resources'][name]
-        current_body = rest_api_gateway.get('Properties', {}).get('Body', {})
+        rest_api_gateway = self.template["Resources"][name]
+        current_body = rest_api_gateway.get("Properties", {}).get("Body", {})
 
-        current_body_as_string = self.yaml_dump_to_str(current_body) if current_body else ''
+        current_body_as_string = (
+            self.yaml_dump_to_str(current_body) if current_body else ""
+        )
         if self.body_as_string != current_body_as_string:
 
             if self.verbose:
-                for text in difflib.unified_diff(current_body_as_string.split("\n"), self.body_as_string.split("\n")):
-                    if text[:3] not in ['---', '+++']:
-                        sys.stderr.write('{}\n'.format(text))
+                for text in difflib.unified_diff(
+                    current_body_as_string.split("\n"), self.body_as_string.split("\n")
+                ):
+                    if text[:3] not in ["---", "+++"]:
+                        sys.stderr.write("{}\n".format(text))
 
             rest_api_gateway = self.copy_resource(rest_api_gateway)
-            if not 'Properties' in rest_api_gateway:
-                rest_api_gateway['Properties'] = {}
+            if not "Properties" in rest_api_gateway:
+                rest_api_gateway["Properties"] = {}
 
-            rest_api_gateway['Properties']['Body'] = self.body
+            rest_api_gateway["Properties"]["Body"] = self.body
 
             if self.add_new_version:
                 new_name = self.new_resource_name(name)
                 sys.stderr.write(
-                    'INFO: adding resource {} with new swagger body in template {}\n'.format(new_name, self.filename))
+                    "INFO: adding resource {} with new swagger body in template {}\n".format(
+                        new_name, self.filename
+                    )
+                )
             else:
                 new_name = name
                 sys.stderr.write(
-                    'INFO: updating resource {} with swagger body in template {}\n'.format(new_name, self.filename))
+                    "INFO: updating resource {} with swagger body in template {}\n".format(
+                        new_name, self.filename
+                    )
+                )
 
             if self.add_new_version:
                 replace_references(self.template, name, new_name)
                 for i in range(0, len(resources) - (self.keep - 1)):
                     sys.stderr.write(
-                        'INFO: removing resource {} from template {}\n'.format(resources[i], self.filename))
-                    del self.template['Resources'][resources[i]]
-            self.template['Resources'][new_name] = rest_api_gateway
+                        "INFO: removing resource {} from template {}\n".format(
+                            resources[i], self.filename
+                        )
+                    )
+                    del self.template["Resources"][resources[i]]
+            self.template["Resources"][new_name] = rest_api_gateway
 
             self.dirty = True
         else:
             sys.stderr.write(
-                'INFO: no changes of swagger body of {} in template {}\n'.format(self.resource_name, self.filename))
+                "INFO: no changes of swagger body of {} in template {}\n".format(
+                    self.resource_name, self.filename
+                )
+            )
 
-    def main(self, resource_name, open_api_specification, api_gateway_extensions, path, add_new_version, keep, dry_run,
-             verbose):
+    def main(
+        self,
+        resource_name,
+        open_api_specification,
+        api_gateway_extensions,
+        path,
+        add_new_version,
+        keep,
+        dry_run,
+        verbose,
+    ):
         self.dry_run = dry_run
         self.verbose = verbose
         self.resource_name = resource_name

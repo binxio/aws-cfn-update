@@ -126,7 +126,9 @@ class OIDCProviderThumbprintsUpdater(CfnUpdater):
         sha1 = public_key.fingerprint(hashes.SHA1())
         fingerprint = binascii.hexlify(sha1).decode("ascii").lower()
 
-        thumbprints = provider.get("Properties", {}).get("ThumbprintList", CommentedSeq())
+        thumbprints = provider.get("Properties", {}).get(
+            "ThumbprintList", CommentedSeq()
+        )
         exists = list(filter(lambda f: f.lower() == fingerprint, thumbprints))
         if exists:
             if self.verbose:
@@ -147,7 +149,6 @@ class OIDCProviderThumbprintsUpdater(CfnUpdater):
         )
         self.dirty = True
 
-
         if not isinstance(thumbprints, CommentedSeq):
             new_thumbprints = CommentedSeq()
             if self.append:
@@ -155,7 +156,9 @@ class OIDCProviderThumbprintsUpdater(CfnUpdater):
             thumbprints = new_thumbprints
 
         thumbprints.append(fingerprint)
-        thumbprints.yaml_add_eol_comment(f"valid until {public_key.not_valid_after}", len(thumbprints)-1)
+        thumbprints.yaml_add_eol_comment(
+            f"valid until {public_key.not_valid_after}", len(thumbprints) - 1
+        )
         provider["Properties"]["ThumbprintList"] = thumbprints
 
 

@@ -25,11 +25,11 @@ from .replace_references import replace_references
 
 
 def split_resource_name(resource_name):
-    m = re.match(r'^(?P<base>.*)v(?P<version>[0-9]+)$', resource_name)
+    m = re.match(r"^(?P<base>.*)v(?P<version>[0-9]+)$", resource_name)
 
     if m is not None:
-        base = m.group('base')
-        version = int(m.group('version'))
+        base = m.group("base")
+        version = int(m.group("version"))
     else:
         base = resource_name
         version = 0
@@ -39,87 +39,87 @@ def split_resource_name(resource_name):
 
 def make_new_resource_name(resource_name):
     base, version = split_resource_name(resource_name)
-    return '{}v{}'.format(base, version + 1)
+    return "{}v{}".format(base, version + 1)
 
 
 class AMIUpdater(CfnUpdater):
     """
-    Updates the AMI name of Custom::AMI resources to the latest version. 
-    With an ami-name-pattern of `amzn-ami-*ecs-optimized` it will update
-    the following resource definition from:
+        Updates the AMI name of Custom::AMI resources to the latest version.
+        With an ami-name-pattern of `amzn-ami-*ecs-optimized` it will update
+        the following resource definition from:
 
-\b
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.a-amazon-ecs-optimized
-           Owners:
-             - amazon
+    \b
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.a-amazon-ecs-optimized
+               Owners:
+                 - amazon
 
-    to:
+        to:
 
-\b
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.l-amazon-ecs-optimized
-           Owners:
-             - amazon
+    \b
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.l-amazon-ecs-optimized
+               Owners:
+                 - amazon
 
 
-    By specifying --add-new-version, a new Custom::AMI will be added
-    to the template with a new name. A suffix `v<version>` is appended
-    to create the new resource. Any reference to the highest Custom::AMI version
-    resource is replaced. It will change:
+        By specifying --add-new-version, a new Custom::AMI will be added
+        to the template with a new name. A suffix `v<version>` is appended
+        to create the new resource. Any reference to the highest Custom::AMI version
+        resource is replaced. It will change:
 
-\b
-      CustomAMI:
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.a-amazon-ecs-optimized
-           Owners:
-             - amazon
-      CustomAMIv2:
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.b-amazon-ecs-optimized
-           Owners:
-             - amazon
-      Instance:
-         Type: AWS::EC2::Instance
-         Properties:
-            ImageId: !Ref CustomAMI
+    \b
+          CustomAMI:
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.a-amazon-ecs-optimized
+               Owners:
+                 - amazon
+          CustomAMIv2:
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.b-amazon-ecs-optimized
+               Owners:
+                 - amazon
+          Instance:
+             Type: AWS::EC2::Instance
+             Properties:
+                ImageId: !Ref CustomAMI
 
-    to:
+        to:
 
-\b
-      CustomAMI:
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.a-amazon-ecs-optimized
-           Owners:
-             - amazon
-      CustomAMIv2:
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.b-amazon-ecs-optimized
-           Owners:
-             - amazon
-      CustomAMIv3:
-         Type: Custom::AMI
-         Properties:
-           Filters:
-             name: amzn-ami-2017.09.l-amazon-ecs-optimized
-           Owners:
-             - amazon
-      Instance:
-         Type: AWS::EC2::Instance
-         Properties:
-            ImageId: !Ref CustomAMIv3
+    \b
+          CustomAMI:
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.a-amazon-ecs-optimized
+               Owners:
+                 - amazon
+          CustomAMIv2:
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.b-amazon-ecs-optimized
+               Owners:
+                 - amazon
+          CustomAMIv3:
+             Type: Custom::AMI
+             Properties:
+               Filters:
+                 name: amzn-ami-2017.09.l-amazon-ecs-optimized
+               Owners:
+                 - amazon
+          Instance:
+             Type: AWS::EC2::Instance
+             Properties:
+                ImageId: !Ref CustomAMIv3
     """
 
     def __init__(self):
@@ -138,36 +138,50 @@ class AMIUpdater(CfnUpdater):
 
     @staticmethod
     def is_ami_definition(resource):
-        return resource.get('Type', '') == 'Custom::AMI'
+        return resource.get("Type", "") == "Custom::AMI"
 
     def create_describe_image_request(self, ami):
         # copy the filters values, except for name and state.
-        properties = ami.get('Properties', {})
-        filters = [{'Name': 'name', 'Values': [self.ami_name_pattern]},
-                   {'Name': 'state', 'Values': ['available']}]
-        for k, v in properties.get('Filters', {}).items():
-            if k not in ['name', 'state']:
-                filters.append({'Name': k, 'Values': v if isinstance(v, list) else [v]})
+        properties = ami.get("Properties", {})
+        filters = [
+            {"Name": "name", "Values": [self.ami_name_pattern]},
+            {"Name": "state", "Values": ["available"]},
+        ]
+        for k, v in properties.get("Filters", {}).items():
+            if k not in ["name", "state"]:
+                filters.append({"Name": k, "Values": v if isinstance(v, list) else [v]})
 
         # copy the rest of the arguments
-        result = {n: (properties.get(n) if isinstance(properties.get(n), list) else [properties.get(n)])
-                  for n in filter(lambda n: properties.get(n) is not None, ['Owners', 'ImageIds', 'ExecutableUsers'])}
-        result['Filters'] = filters
+        result = {
+            n: (
+                properties.get(n)
+                if isinstance(properties.get(n), list)
+                else [properties.get(n)]
+            )
+            for n in filter(
+                lambda n: properties.get(n) is not None,
+                ["Owners", "ImageIds", "ExecutableUsers"],
+            )
+        }
+        result["Filters"] = filters
         return result
 
     def _describe_images(self, **kwargs):
-        return boto3.client('ec2').describe_images(**kwargs)
+        return boto3.client("ec2").describe_images(**kwargs)
 
     def load_latest_ami_name_pattern(self, resource):
         response = self._describe_images(**self.create_describe_image_request(resource))
 
-        images = sorted(response['Images'], key=lambda i: i['CreationDate'])
-        self.latest_ami_name_pattern = images[-1]['Name'] if len(images) > 0 else None
+        images = sorted(response["Images"], key=lambda i: i["CreationDate"])
+        self.latest_ami_name_pattern = images[-1]["Name"] if len(images) > 0 else None
         if len(images) > 0:
             sys.stderr.write(
-                'INFO: using {} matching {}, created on {}\n'.format(self.latest_ami_name_pattern,
-                                                                     self.ami_name_pattern,
-                                                                     images[-1]['CreationDate']))
+                "INFO: using {} matching {}, created on {}\n".format(
+                    self.latest_ami_name_pattern,
+                    self.ami_name_pattern,
+                    images[-1]["CreationDate"],
+                )
+            )
 
     def is_ami_name_pattern_match(self, name):
         regex = re.compile(fnmatch.translate(self.ami_name_pattern))
@@ -175,11 +189,18 @@ class AMIUpdater(CfnUpdater):
 
     def all_custom_ami_resources(self):
         r = self.resources
-        return filter(lambda n: self.is_ami_definition(r[n]) and self.is_name_filter_match(r[n]), r)
+        return filter(
+            lambda n: self.is_ami_definition(r[n]) and self.is_name_filter_match(r[n]),
+            r,
+        )
 
     def is_name_filter_match(self, ami):
-        if 'Properties' in ami and 'Filters' in ami['Properties'] and 'name' in ami['Properties']['Filters']:
-            return self.is_ami_name_pattern_match(ami['Properties']['Filters']['name'])
+        if (
+            "Properties" in ami
+            and "Filters" in ami["Properties"]
+            and "name" in ami["Properties"]["Filters"]
+        ):
+            return self.is_ami_name_pattern_match(ami["Properties"]["Filters"]["name"])
         return False
 
     def custom_ami_resources_partitions(self):
@@ -191,9 +212,10 @@ class AMIUpdater(CfnUpdater):
                 partitions[base] = {}
             partitions[base][resource_name] = self.resources[resource_name]
 
-
         for base in partitions:
-            resource_names = sorted(partitions[base].keys(), key=lambda n: split_resource_name(n)[1])
+            resource_names = sorted(
+                partitions[base].keys(), key=lambda n: split_resource_name(n)[1]
+            )
             yield OrderedDict({name: partitions[base][name] for name in resource_names})
 
     @staticmethod
@@ -209,21 +231,28 @@ class AMIUpdater(CfnUpdater):
         return result
 
     def ami_requires_update(self, ami):
-        name = ami['Properties']['Filters']['name']
-        return self.latest_ami_name_pattern is not None and name != self.latest_ami_name_pattern
+        name = ami["Properties"]["Filters"]["name"]
+        return (
+            self.latest_ami_name_pattern is not None
+            and name != self.latest_ami_name_pattern
+        )
 
     def update_ami(self, resource_name, ami):
         if self.ami_requires_update(ami):
-            ami['Properties']['Filters']['name'] = self.latest_ami_name_pattern
+            ami["Properties"]["Filters"]["name"] = self.latest_ami_name_pattern
             sys.stderr.write(
                 'INFO: updating AMI definition "{}" name filter to {} in {}\n'.format(
-                    resource_name, self.latest_ami_name_pattern, self.filename))
+                    resource_name, self.latest_ami_name_pattern, self.filename
+                )
+            )
             self.dirty = True
         else:
             if self.verbose:
                 sys.stderr.write(
                     'INFO: AMI definition "{}" name already up to date in {}\n'.format(
-                        resource_name, self.filename))
+                        resource_name, self.filename
+                    )
+                )
 
     def update_inplace(self):
         """
@@ -248,7 +277,9 @@ class AMIUpdater(CfnUpdater):
                     self.resources[new_resource_name] = ami
                     self.update_ami(new_resource_name, ami)
                     for old_resource_name in reversed(ami_resources):
-                        if replace_references(self.template, old_resource_name, new_resource_name):
+                        if replace_references(
+                            self.template, old_resource_name, new_resource_name
+                        ):
                             break
 
     def update_template(self):
@@ -264,7 +295,11 @@ class AMIUpdater(CfnUpdater):
         self.add_new_version = add_new_version
         self.load_latest_ami_name_pattern({})
         if self.latest_ami_name_pattern is None:
-            sys.stderr.write('ERROR: image name {} does not resolve to an active AMI \n'.format(self.ami_name_pattern))
+            sys.stderr.write(
+                "ERROR: image name {} does not resolve to an active AMI \n".format(
+                    self.ami_name_pattern
+                )
+            )
             sys.exit(1)
 
         self.update(path)

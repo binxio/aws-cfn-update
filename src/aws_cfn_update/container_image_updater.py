@@ -18,28 +18,28 @@ from .cfn_updater import CfnUpdater
 
 class ContainerImageUpdater(CfnUpdater):
     """
-    Updates the Docker image of ECS Container Definitions.
+        Updates the Docker image of ECS Container Definitions.
 
-    it will update any container definition where the base image name matches
-    the specified image name excluding the tag.
+        it will update any container definition where the base image name matches
+        the specified image name excluding the tag.
 
-    For example, an image name of `mvanholsteijn/paas-monitor:0.6.0` will update:
+        For example, an image name of `mvanholsteijn/paas-monitor:0.6.0` will update:
 
-\b
-        Type: AWS::ECS::TaskDefinition
-        Properties:
-          ContainerDefinitions:
-            - Name: paas-monitor
-              Image: mvanholsteijn/paas-monitor:0.5.9
+    \b
+            Type: AWS::ECS::TaskDefinition
+            Properties:
+              ContainerDefinitions:
+                - Name: paas-monitor
+                  Image: mvanholsteijn/paas-monitor:0.5.9
 
-    to:
+        to:
 
-\b
-        Type: AWS::ECS::TaskDefinition
-        Properties:
-          ContainerDefinitions:
-            - Name: paas-monitor
-              Image: mvanholsteijn/paas-monitor:0.6.0
+    \b
+            Type: AWS::ECS::TaskDefinition
+            Properties:
+              ContainerDefinitions:
+                - Name: paas-monitor
+                  Image: mvanholsteijn/paas-monitor:0.6.0
 
     """
 
@@ -49,32 +49,36 @@ class ContainerImageUpdater(CfnUpdater):
 
     @property
     def image(self):
-        return ':'.join(self._image)
+        return ":".join(self._image)
 
     @image.setter
     def image(self, image):
-        self._image = image.split(':', 2) if image is not None else []
+        self._image = image.split(":", 2) if image is not None else []
 
     @property
     def base_image(self):
-        return self._image[0] if self._image is not None and len(self._image) > 0 else ''
+        return (
+            self._image[0] if self._image is not None and len(self._image) > 0 else ""
+        )
 
     @property
     def image_tag(self):
-        return self._image[1] if self._image is not None and len(self._image) > 1 else ''
+        return (
+            self._image[1] if self._image is not None and len(self._image) > 1 else ""
+        )
 
     @staticmethod
     def is_task_definition(resource):
         """
         returns true if the resource is of type AWS::ECS::TaskDefinition
         """
-        return resource.get('Type', '') == 'AWS::ECS::TaskDefinition'
+        return resource.get("Type", "") == "AWS::ECS::TaskDefinition"
 
     def is_matching_container(self, container):
         """
         returns true if there is a match on the image
         """
-        return container.get('Image', '').split(':')[0] == self.base_image
+        return container.get("Image", "").split(":")[0] == self.base_image
 
     def all_matching_task_definitions(self, resources):
         return filter(lambda n: self.is_task_definition(resources[n]), resources)
@@ -83,16 +87,20 @@ class ContainerImageUpdater(CfnUpdater):
         """
         updates the Image of container definitions in the CFN template `self.template`.
         """
-        resources = self.template.get('Resources', {})
+        resources = self.template.get("Resources", {})
         for task_name in self.all_matching_task_definitions(resources):
             task = resources[task_name]
-            containers = task.get('Properties', {}).get('ContainerDefinitions', [])
-            for container in filter(lambda c: self.is_matching_container(c), containers):
-                if container['Image'] != self.image:
+            containers = task.get("Properties", {}).get("ContainerDefinitions", [])
+            for container in filter(
+                lambda c: self.is_matching_container(c), containers
+            ):
+                if container["Image"] != self.image:
                     sys.stderr.write(
-                        'INFO: updating image of container definition {} for task {} in {}\n'.format(
-                            container['Name'], task_name, self.filename))
-                    container['Image'] = self.image
+                        "INFO: updating image of container definition {} for task {} in {}\n".format(
+                            container["Name"], task_name, self.filename
+                        )
+                    )
+                    container["Image"] = self.image
                     self.dirty = True
 
     def main(self, image, dry_run, verbose, paths):

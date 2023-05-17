@@ -19,22 +19,22 @@ from ruamel.yaml.scalarstring import PreservedScalarString
 
 class LambdaInlineCodeUpdater(CfnUpdater):
     """
-    Updates the inline code of an AWS::Lambda::Function resource.
+        Updates the inline code of an AWS::Lambda::Function resource.
 
-\b
-  ELBListenerRuleProvider:
-    Type: AWS::Lambda::Function
+    \b
+      ELBListenerRuleProvider:
+        Type: AWS::Lambda::Function
 
-\b
-  ELBListenerRuleProvider:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        ZipFile:
-          import boto3
-          import cfnresponse
-          ELB = boto3.client('elbv2')
-          ...
+    \b
+      ELBListenerRuleProvider:
+        Type: AWS::Lambda::Function
+        Properties:
+          Code:
+            ZipFile:
+              import boto3
+              import cfnresponse
+              ELB = boto3.client('elbv2')
+              ...
     """
 
     def __init__(self):
@@ -45,22 +45,30 @@ class LambdaInlineCodeUpdater(CfnUpdater):
         """
         updates the Code property of a AWS::Lambda::Function resource of name `self.resource` to `self.code`
         """
-        resource = self.template.get('Resources', {}).get(self.resource, None)
-        if resource and resource['Type'] == 'AWS::Lambda::Function':
-            code = resource.get('Properties', {}).get('Code', {})
-            old_code = code['ZipFile'] if 'ZipFile' in code else None
+        resource = self.template.get("Resources", {}).get(self.resource, None)
+        if resource and resource["Type"] == "AWS::Lambda::Function":
+            code = resource.get("Properties", {}).get("Code", {})
+            old_code = code["ZipFile"] if "ZipFile" in code else None
             if old_code != self.code:
                 sys.stderr.write(
-                    'INFO: updating inline code of lambda {} in {}\n'.format(self.resource, self.filename))
-                if 'Properties' not in resource:
-                    resource['Properties'] = {}
-                if 'Code' not in resource['Properties']:
-                    resource['Properties']['Code'] = {}
-                resource['Properties']['Code'] = {'ZipFile': PreservedScalarString(self.code)}
+                    "INFO: updating inline code of lambda {} in {}\n".format(
+                        self.resource, self.filename
+                    )
+                )
+                if "Properties" not in resource:
+                    resource["Properties"] = {}
+                if "Code" not in resource["Properties"]:
+                    resource["Properties"]["Code"] = {}
+                resource["Properties"]["Code"] = {
+                    "ZipFile": PreservedScalarString(self.code)
+                }
                 self.dirty = True
         elif resource:
             sys.stderr.write(
-                'WARN: resource {} in {} is not of type AWS::Lambda::Function\n'.format(self.resource, self.filename))
+                "WARN: resource {} in {} is not of type AWS::Lambda::Function\n".format(
+                    self.resource, self.filename
+                )
+            )
 
     def main(self, resource, code, paths, dry_run, verbose):
         self.resource = resource
