@@ -21,19 +21,19 @@ from ruamel.yaml import YAML
 
 class CfnUpdater(object):
     """
-    base class for a CloudFormation  update. To implement a specific updater: 
+    base class for a CloudFormation  update. To implement a specific updater:
 
     - inherit this class
     - override the method update_template()
     - call the method update(path)
 
-    it will read the template from files with extension .yaml, .yml and .json into 
+    it will read the template from files with extension .yaml, .yml and .json into
     the property `self.template`.
 
-    If the property `self.dirty` is set to True, the template will be written 
+    If the property `self.dirty` is set to True, the template will be written
     back to the originating file.
 
-    Please note that formatting and comments may be lost, when using this 
+    Please note that formatting and comments may be lost, when using this
     updater.
     """
 
@@ -46,6 +46,11 @@ class CfnUpdater(object):
         self.dry_run = False
         self.verbose = False
         self._filename = None
+        self.yaml = YAML(typ="rt")
+        self.yaml.preserve_quotes = True
+        self.yaml.explicit_start = True
+        self.yaml.width = 4096
+        self.yaml.indent(mapping=2, sequence=4, offset=2)
 
     @property
     def filename(self):
@@ -67,8 +72,8 @@ class CfnUpdater(object):
         self.template_format = parts[1]
         self.template = None
         self.dirty = False
-        if self.template_format not in ('.json', '.yml', '.yaml'):
-            raise ValueError('%s has no .json, .yaml or .yml extension.' % filename)
+        if self.template_format not in (".json", ".yml", ".yaml"):
+            raise ValueError("%s has no .json, .yaml or .yml extension." % filename)
 
     def load(self):
         """
@@ -76,21 +81,17 @@ class CfnUpdater(object):
         """
         self.dirty = False
         self.template = None
-        with open(self.filename, 'r') as f:
-            if self.template_format == '.json':
+        with open(self.filename, "r") as f:
+            if self.template_format == ".json":
                 self.template = json.load(f, object_pairs_hook=collections.OrderedDict)
             else:
-                yaml = YAML(typ='rt')
-                yaml.preserve_quotes = True
-                yaml.explicit_start = True
-                yaml.width = 4096
-                self.template = yaml.load(f)
+                self.template = self.yaml.load(f)
 
     def is_cloudformation_template(self):
         """
         returns true if the `self.template` is a AWS CloudFormation template
         """
-        return self.template and 'AWSTemplateFormatVersion' in self.template
+        return self.template and "AWSTemplateFormatVersion" in self.template
 
     def write(self):
         """
@@ -99,20 +100,17 @@ class CfnUpdater(object):
         """
         if not self.dirty:
             if self.verbose:
-                sys.stderr.write('INFO: no changes in {}\n'.format(self.filename))
+                sys.stderr.write("INFO: no changes in {}\n".format(self.filename))
             return
 
         if self.dry_run:
             return
 
-        with open(self.filename, 'w') as f:
-            if self.template_format == '.yaml':
-                yaml = YAML()
-                yaml.explicit_start = True
-                yaml.indent(mapping=2, sequence=4, offset=2)
-                yaml.dump(self.template, f)
+        with open(self.filename, "w") as f:
+            if self.template_format == ".yaml":
+                self.yaml.dump(self.template, f)
             else:
-                json.dump(self.template, f, separators=(',', ': '), indent=2)
+                json.dump(self.template, f, separators=(",", ": "), indent=2)
 
     def update_template(self):
         """
@@ -122,7 +120,7 @@ class CfnUpdater(object):
 
     @property
     def resources(self):
-        return self.template.get('Resources', {})
+        return self.template.get("Resources", {})
 
     def update(self, path):
         """
@@ -133,7 +131,11 @@ class CfnUpdater(object):
             for p in path:
                 self.update(p)
         elif os.path.isfile(path):
-            if path.endswith('.yml') or path.endswith('.yaml') or path.endswith('.json'):
+            if (
+                path.endswith(".yml")
+                or path.endswith(".yaml")
+                or path.endswith(".json")
+            ):
                 self.filename = path
                 self.load()
                 if self.is_cloudformation_template():
@@ -141,19 +143,22 @@ class CfnUpdater(object):
                     self.write()
                 else:
                     if self.verbose:
-                        sys.stderr.write('INFO: skipping {} as it is not a CloudFormation template\n'.format(path))
+                        sys.stderr.write(
+                            "INFO: skipping {} as it is not a CloudFormation template\n".format(
+                                path
+                            )
+                        )
         elif os.path.isdir(path):
             for root, dirs, files in os.walk(path):
                 for f in files:
                     self.update(os.path.join(root, f))
         else:
-            sys.stderr.write('ERROR: {} is not a file or directory\n'.format(path))
+            sys.stderr.write("ERROR: {} is not a file or directory\n".format(path))
             sys.exit(1)
+
 
 def read_template(filename: str) -> dict:
     src = CfnUpdater()
     src.filename = filename
     src.load()
     return src.template
-
-yaml = YAML()

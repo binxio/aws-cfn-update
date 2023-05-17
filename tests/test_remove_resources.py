@@ -1,6 +1,7 @@
 from aws_cfn_update.remove_resource import remove_resource_from_template
-from aws_cfn_update.cfn_updater import yaml
+from aws_cfn_update.cfn_updater import CfnUpdater
 from io import StringIO
+from ruamel.yaml import YAML
 
 
 def test_simple():
@@ -45,6 +46,7 @@ def test_array_reference():
 
 
 def test_yaml():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:
@@ -58,6 +60,7 @@ Resources:
 
 
 def test_yaml_simple_ref():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:
@@ -81,6 +84,7 @@ Outputs:
 
 
 def test_yaml_simple_getatt():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:
@@ -100,6 +104,7 @@ Resources:
 
 
 def test_yaml_nested_ref():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:
@@ -119,6 +124,7 @@ Resources:
 
 
 def test_yaml_ref_in_sub():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:
@@ -136,6 +142,7 @@ Resources:
 
 
 def test_yaml_no_ref_in_sub():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:
@@ -153,6 +160,7 @@ Resources:
 
 
 def test_yaml_ref_in_sub_array_style():
+    yaml = CfnUpdater().yaml
     template = yaml.load(
         """
 Resources:

@@ -2,7 +2,7 @@ from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 import json
 
 from aws_cfn_update.add_missing_resources import add_missing_resources
-from aws_cfn_update.cfn_updater import yaml
+from aws_cfn_update.cfn_updater import CfnUpdater
 
 
 def test_simple():

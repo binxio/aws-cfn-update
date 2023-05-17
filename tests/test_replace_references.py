@@ -1,5 +1,5 @@
 from aws_cfn_update.replace_references import replace_references
-from aws_cfn_update.cfn_updater import yaml
+from aws_cfn_update.cfn_updater import CfnUpdater
 from io import StringIO
 
 
@@ -22,9 +22,10 @@ def test_simple():
 
 
 def test_yaml():
-    template = yaml.load("AMI: !Ref Old")
+    yaml = CfnUpdater().yaml
+    template = yaml.load("---\nAMI: !Ref Old")
     assert replace_references(template, "Old", "New")
 
     result = StringIO()
     yaml.dump(template, result)
-    assert result.getvalue() == "AMI: !Ref New\n"
+    assert result.getvalue() == "---\nAMI: !Ref New\n"
