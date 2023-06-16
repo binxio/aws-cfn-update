@@ -15,7 +15,7 @@ def replace_references(template, old_reference, new_reference) -> bool:
             elif (
                 isinstance(value, TaggedScalar)
                 and value.tag
-                and value.tag.value == "!Ref"
+                and value.tag.suffix == "Ref"
                 and value.value == old_reference
             ):
                 value.value = new_reference

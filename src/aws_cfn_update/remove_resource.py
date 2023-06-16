@@ -47,14 +47,14 @@ def references_in_sub(sub, name):
 
 def is_tag_reference(obj, name):
     if isinstance(obj, TaggedScalar):
-        if obj.tag.value == "!Ref":
+        if obj.tag.suffix == "Ref":
             return str(obj.value) == name
-        elif obj.tag.value == "!Sub":
+        elif obj.tag.suffix == "Sub":
             return references_in_sub(obj.value, name)
-        elif obj.tag.value == "!GetAtt":
+        elif obj.tag.suffix == "GetAtt":
             return str(obj.value).split(".")[0] == name
     elif isinstance(obj, CommentedSeq):
-        if obj.tag.value == "!GetAtt":
+        if obj.tag.suffix == "GetAtt":
             return len(obj) > 1 and obj[0] == name
     return False
 
