@@ -61,7 +61,7 @@ def validate_image(ctx, param, value):
 
 
 @cli.command(name="container-image", help=ContainerImageUpdater.__doc__)
-@click.option("--image", required=True, callback=validate_image, help="to update to")
+@click.option("--image", required=True, multiple=True, default=[], allback=validate_image, help="to update to")
 @click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def task_image(ctx, image, path):

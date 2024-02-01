@@ -13,6 +13,8 @@
 #
 #   Copyright 2018 binx.io B.V.
 import sys
+from typing import Optional, Union, List
+
 from .cfn_updater import CfnUpdater
 
 
@@ -45,27 +47,27 @@ class ContainerImageUpdater(CfnUpdater):
 
     def __init__(self):
         super(ContainerImageUpdater, self).__init__()
-        self._image = []
+        self._images = {}
+
 
     @property
-    def image(self):
-        return ":".join(self._image)
+    def images(self) -> [str]:
+        return self._images.values()
 
-    @image.setter
-    def image(self, image):
-        self._image = image.split(":", 2) if image is not None else []
+    @images.setter
+    def images(self, images: [str]):
+        self._images = {}
+        for image in images:
+            parts = image.split(':')
+            if len(parts) != 2:
+                raise ValueError(f'{image} is an invalid image name')
+            base = parts[0]
+            if base in self._images and image != self._images[base]:
+                raise ValueError(f'image already defined for {base}')
+            self._images[base] = image
 
-    @property
-    def base_image(self):
-        return (
-            self._image[0] if self._image is not None and len(self._image) > 0 else ""
-        )
-
-    @property
-    def image_tag(self):
-        return (
-            self._image[1] if self._image is not None and len(self._image) > 1 else ""
-        )
+    def get_new_image_reference(self, image: str) -> Optional[str]:
+        return self._images.get(image.split(':')[0])
 
     @staticmethod
     def is_task_definition(resource):
@@ -73,12 +75,6 @@ class ContainerImageUpdater(CfnUpdater):
         returns true if the resource is of type AWS::ECS::TaskDefinition
         """
         return resource.get("Type", "") == "AWS::ECS::TaskDefinition"
-
-    def is_matching_container(self, container):
-        """
-        returns true if there is a match on the image
-        """
-        return container.get("Image", "").split(":")[0] == self.base_image
 
     def all_matching_task_definitions(self, resources):
         return filter(lambda n: self.is_task_definition(resources[n]), resources)
@@ -92,18 +88,19 @@ class ContainerImageUpdater(CfnUpdater):
             task = resources[task_name]
             containers = task.get("Properties", {}).get("ContainerDefinitions", [])
             for container in filter(
-                lambda c: self.is_matching_container(c), containers
+                lambda c: self.get_new_image_reference(c["Image"]), containers
             ):
-                if container["Image"] != self.image:
+                new_image = self.get_new_image_reference(container["Image"])
+                if container["Image"] != new_image:
                     sys.stderr.write(
                         "INFO: updating image of container definition {} for task {} in {}\n".format(
                             container["Name"], task_name, self.filename
                         )
                     )
-                    container["Image"] = self.image
+                    container["Image"] = new_image
                     self.dirty = True
 
-    def main(self, image, dry_run, verbose, paths):
+    def main(self, image:[str], dry_run:bool, verbose:bool, paths:[str]):
         self.image = image
         self.dry_run = dry_run
         self.verbose = verbose
