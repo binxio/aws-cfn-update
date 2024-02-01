@@ -66,7 +66,7 @@ def validate_image(ctx, param, value):
 @click.pass_context
 def task_image(ctx, image, path):
     if not image:
-        image = get_default_list_from_environment("AWS_CFN_UPDATE_CONTAINER_IMAGES")
+        image = os.getenv("AWS_CFN_UPDATE_CONTAINER_IMAGES", "").split()
 
     if not image:
         click.echo("no container images to update")
@@ -203,7 +203,7 @@ def lambda_body(ctx, resource, file, path):
 def update_s3_key(ctx, s3_key, path):
     updater = LambdaS3KeyUpdater()
     if not s3_key:
-        s3_key = get_default_list_from_environment("AWS_CFN_UPDATE_LAMBDA_S3_KEYS")
+        s3_key = os.getenv("AWS_CFN_UPDATE_LAMBDA_S3_KEYS", "").split()
 
     if not s3_key:
         click.echo("no Lambda s3 keys to update")
@@ -226,23 +226,6 @@ def config_rule_body(ctx, resource, file, path):
     with open(file, "r") as f:
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
-
-
-def get_default_list_from_environment(name: str) -> [str]:
-    """
-    returns a list of string values separated by spaces from the enviornment variable `name`
-
-    >>> os.environ["TEST"] = "a b c d"
-    >>> get_default_list_from_environment("TEST")
-    ['a', 'b', 'c', 'd']
-    >>> get_default_list_from_environment("DOES_NOT_EXIST")
-    []
-    >>> os.environ["TEST"] = "a"
-    >>> get_default_list_from_environment("TEST")
-    ['a']
-    """
-    return list(filter(lambda v: v, re.split("\s+", os.getenv(name, "").strip())))
-
 
 cli.add_command(update_state_machine_definition)
 cli.add_command(remove_resource)
