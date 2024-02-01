@@ -117,7 +117,8 @@ to::
         Image: mvanholsteijn/paas-monitor:0.6.0
 ```
 
-
+The environment variable AWS_CFN_UPDATE_CONTAINER_IMAGES can be used to specify a
+whitespace separated list of container images to update.
 
 # latest-ami - Updates the AMI name of Custom::AMI resources
 
@@ -303,6 +304,39 @@ into:
             ...
         Function: cfn-listener-rule-provider
 ```
+
+# lambda-s3-key - ypdates the S3Key entry of a Lambda Function definition
+
+Updates the S3Key entry of a Lambda Function definition. For example:
+
+```shell
+aws-cfn-update lambda-s3-key --s3-key lambdas/iam-sudo-0.3.1.zip
+```
+
+will change:
+
+```yaml
+      ELBListenerRuleProvider:
+        Type: AWS::Lambda::Function
+        Properties:
+          Code:
+            S3Bucket: !Sub 'binxio-public-${AWS::Region}'
+            S3Key: lambdas/iam-sudo-0.1.0.zip
+```
+into:
+
+```yaml
+      ELBListenerRuleProvider:
+        Type: AWS::Lambda::Function
+        Properties:
+          Code:
+            S3Bucket: !Sub 'binxio-public-${AWS::Region}'
+            S3Key: lambdas/iam-sudo-0.3.1.zip
+              ...
+```
+
+The environment variable AWS_CFN_UPDATE_LAMBDA_S3_KEYS can be used to specify a
+whitespace separated list of S3 keys to update.
 
 # config-rule-inline-code - updates the inline code of an AWS::Config::ConfigRule resource.
 

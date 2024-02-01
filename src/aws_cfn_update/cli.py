@@ -12,6 +12,7 @@
 #   limitations under the License.
 #
 #   Copyright 2018 binx.io B.V.
+import os
 import re
 from copy import copy
 from datetime import datetime
@@ -35,7 +36,6 @@ from aws_cfn_update.add_new_resources import add_new_resources
 from aws_cfn_update.oidc_provider_thumbprints_updater import (
     update_oidc_provider_thumbprint,
 )
-
 
 @click.group()
 @click.option(
@@ -61,10 +61,17 @@ def validate_image(ctx, param, value):
 
 
 @cli.command(name="container-image", help=ContainerImageUpdater.__doc__)
-@click.option("--image", required=True, multiple=True, default=[], allback=validate_image, help="to update to")
+@click.option("--image", required=False, multiple=True, default=[], callback=validate_image, help="to update to")
 @click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def task_image(ctx, image, path):
+    if not image:
+        image = get_default_list_from_environment("AWS_CFN_UPDATE_CONTAINER_IMAGES")
+
+    if not image:
+        click.echo("no container images to update")
+        return
+
     updater = ContainerImageUpdater()
     updater.main(image, ctx.obj["dry_run"], ctx.obj["verbose"], list(path))
 
@@ -190,13 +197,20 @@ def lambda_body(ctx, resource, file, path):
     updater.main(resource, body, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
 
 @cli.command(name="lambda-s3-key", help=LambdaS3KeyUpdater.__doc__)
-@click.option("--s3-key", required=True, multiple=True, default=[], help="The new S3 key in semver format")
+@click.option("--s3-key", required=False, multiple=True, default=[], help="The new S3 key in semver format")
 @click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def update_s3_key(ctx, s3_key, path):
     updater = LambdaS3KeyUpdater()
+    if not s3_key:
+        s3_key = get_default_list_from_environment("AWS_CFN_UPDATE_LAMBDA_S3_KEYS")
 
-    updater.main(list(s3_key), list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
+    if not s3_key:
+        click.echo("no Lambda s3 keys to update")
+        return
+
+
+    updater.main(s3_key, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
 
 
 @cli.command(name="config-rule-inline-code", help=ConfigRuleInlineCodeUpdater.__doc__)
@@ -212,6 +226,22 @@ def config_rule_body(ctx, resource, file, path):
     with open(file, "r") as f:
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
+
+
+def get_default_list_from_environment(name: str) -> [str]:
+    """
+    returns a list of string values separated by spaces from the enviornment variable `name`
+
+    >>> os.environ["TEST"] = "a b c d"
+    >>> get_default_list_from_environment("TEST")
+    ['a', 'b', 'c', 'd']
+    >>> get_default_list_from_environment("DOES_NOT_EXIST")
+    []
+    >>> os.environ["TEST"] = "a"
+    >>> get_default_list_from_environment("TEST")
+    ['a']
+    """
+    return list(filter(lambda v: v, re.split("\s+", os.getenv(name, "").strip())))
 
 
 cli.add_command(update_state_machine_definition)

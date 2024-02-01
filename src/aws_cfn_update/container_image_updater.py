@@ -43,6 +43,9 @@ class ContainerImageUpdater(CfnUpdater):
                 - Name: paas-monitor
                   Image: mvanholsteijn/paas-monitor:0.6.0
 
+
+        The environment variable AWS_CFN_UPDATE_CONTAINER_IMAGES can be used to specify a
+        whitespace separated list of container images to update.
     """
 
     def __init__(self):

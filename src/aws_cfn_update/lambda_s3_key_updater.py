@@ -13,9 +13,10 @@
 #
 #   Copyright 2024 binx.io B.V.
 import re
-from .cfn_updater import CfnUpdater
-from typing import Dict, Optional
+import sys
+from typing import Optional
 
+from .cfn_updater import CfnUpdater
 
 _s3_key_semver_pattern = re.compile(
     r"(.*)(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?\.zip$"
@@ -40,6 +41,9 @@ class LambdaS3KeyUpdater(CfnUpdater):
             S3Bucket: !Sub 'binxio-public-${AWS::Region}'
             S3Key: lambdas/iam-sudo-0.3.1.zip
               ...
+
+        The environment variable AWS_CFN_UPDATE_LAMBDA_S3_KEYS can be used to specify a
+        whitespace separated list of S3 keys to update.
     """
 
     def __init__(self):
@@ -55,6 +59,7 @@ class LambdaS3KeyUpdater(CfnUpdater):
 
     @s3_keys.setter
     def s3_keys(self, s3_keys: [str]):
+        self._s3_keys = {}
         for s3_key in s3_keys:
             match = _s3_key_semver_pattern.match(s3_key)
             if not match:
@@ -75,8 +80,15 @@ class LambdaS3KeyUpdater(CfnUpdater):
 
                 match = _s3_key_semver_pattern.match(s3_key)
                 if match and (replacement := self.s3_key_by_prefix(match.group(1))):
-                    code["S3Key"] = replacement
-                    self.dirty = True
+                    if replacement != s3_key:
+                        sys.stderr.write(
+                            "INFO: updating S3Key of Lambda function {} in {}\n".format(
+                                resource_name, self.filename
+                            )
+                        )
+
+                        code["S3Key"] = replacement
+                        self.dirty = True
 
     def main(self, s3_keys: [str], paths, dry_run, verbose):
         self.s3_keys = s3_keys
