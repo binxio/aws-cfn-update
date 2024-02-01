@@ -15,4 +15,3 @@ tox = "*"
 build = "*"
 twine = "*"
 pytest = "*"
-aws-cfn-update = {path = "."}
