@@ -145,7 +145,7 @@ class OIDCProviderThumbprintsUpdater(CfnUpdater):
             )
 
         sys.stderr.write(
-            f"INFO: updating fingerprint of {url}, for OIDC provider {name} to {fingerprint}, valid until {public_key.not_valid_after}\n"
+            f"INFO: updating fingerprint of {url}, for OIDC provider {name} to {fingerprint}, valid until {public_key.not_valid_after_utc}\n"
         )
         self.dirty = True
 
@@ -157,7 +157,7 @@ class OIDCProviderThumbprintsUpdater(CfnUpdater):
 
         thumbprints.append(fingerprint)
         thumbprints.yaml_add_eol_comment(
-            f"valid until {public_key.not_valid_after}", len(thumbprints) - 1
+            f"valid until {public_key.not_valid_after_utc}", len(thumbprints) - 1
         )
         provider["Properties"]["ThumbprintList"] = thumbprints
 
