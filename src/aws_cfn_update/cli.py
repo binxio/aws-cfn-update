@@ -28,6 +28,7 @@ from aws_cfn_update.cron_schedule_expression_updater import (
 from aws_cfn_update.latest_ami_updater import AMIUpdater
 from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 from aws_cfn_update.lambda_inline_code_updater import LambdaInlineCodeUpdater
+from aws_cfn_update.lambda_s3_key_updater import LambdaS3KeyUpdater
 from aws_cfn_update.statemachine_updater import update_state_machine_definition
 from aws_cfn_update.remove_resource import remove_resource
 from aws_cfn_update.add_new_resources import add_new_resources
@@ -187,6 +188,15 @@ def lambda_body(ctx, resource, file, path):
     with open(file, "r") as f:
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
+
+@cli.command(name="lambda-s3-key", help=LambdaS3KeyUpdater.__doc__)
+@click.option("--s3-key", required=True, multiple=True, default=[], help="The new S3 key in semver format")
+@click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
+@click.pass_context
+def update_s3_key(ctx, s3_key, path):
+    updater = LambdaS3KeyUpdater()
+
+    updater.main(list(s3_key), list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
 
 
 @cli.command(name="config-rule-inline-code", help=ConfigRuleInlineCodeUpdater.__doc__)
