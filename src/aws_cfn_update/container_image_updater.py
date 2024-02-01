@@ -104,7 +104,7 @@ class ContainerImageUpdater(CfnUpdater):
                     self.dirty = True
 
     def main(self, image:[str], dry_run:bool, verbose:bool, paths:[str]):
-        self.image = image
+        self.images = image
         self.dry_run = dry_run
         self.verbose = verbose
         self.update(paths)

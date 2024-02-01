@@ -52,7 +52,7 @@ def cli(ctx, dry_run, verbose):
 
 
 def validate_image(ctx, param, value):
-    if re.match(r"(?:.+/)?([^:]+)(?::.+)?", value):
+    if all(map(lambda i: re.match(r"(?:.+/)?([^:]+)(?::.+)?", i), value)):
         return value
     else:
         raise click.BadParameter(
