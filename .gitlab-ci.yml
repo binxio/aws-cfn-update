@@ -10,3 +10,4 @@ addReadme:
     - git push
   only:
     - triggers
+    - schedules
