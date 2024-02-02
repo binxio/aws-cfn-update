@@ -1,0 +1,12 @@
+stages:
+  - build
+
+addReadme:
+  stage: build
+  script:
+    - echo "This is a README file" > README.md
+    - git add README.md
+    - git commit -m "Add README.md"
+    - git push
+  only:
+    - triggers
