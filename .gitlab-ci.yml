@@ -9,4 +9,4 @@ addReadme:
     - git config user.name "Your Name" 
     - git add README.md
     - git commit -m "Add README.md"
-    - git push
+    - git push origin HEAD:${CI_COMMIT_BRANCH}
