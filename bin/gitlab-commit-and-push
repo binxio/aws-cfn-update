@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+failed () { 
+    echo "Usage:~ $(basename $0) commit-message" >&2
+    echo "$@" >&2 
+    exit 1
+}
+
+COMMIT_MESSAGE="$@"
+[[ -z $COMMIT_MESSAGE ]] && failed ""
+
+
+chmod go-rxw $PRIVATE_KEY_FILE
+export GIT_SSH_COMMAND="ssh -i $PRIVATE_KEY_FILE -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+if git remote get-url origin >/dev/null 2>&1; then
+    git remote remove update
+fi
+
+git remote add update git@$CI_SERVER_HOST:$CI_PROJECT_PATH.git
+git fetch update
+git branch $CI_COMMIT_REF_NAME --set-upstream-to update/$CI_COMMIT_REF_NAME
+git switch -c $CI_COMMIT_REF_NAME
+[[ -z $(git status --short >/dev/null) ]] && (echo "INFO: no changes to commit" >&2 && exit 0)
+
+git commit -am "${COMMIT_MESSAGE}"
+if ! git push; then
+	git pull --rebase 
+	git push
+fi
