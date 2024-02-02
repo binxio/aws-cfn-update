@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x
 failed () { 
     echo "Usage:~ $(basename $0) commit-message" >&2
     echo "$@" >&2 
