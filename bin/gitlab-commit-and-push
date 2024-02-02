@@ -13,7 +13,7 @@ COMMIT_MESSAGE="$@"
 chmod go-rxw $PRIVATE_KEY_FILE
 export GIT_SSH_COMMAND="ssh -i $PRIVATE_KEY_FILE -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-if git remote get-url origin >/dev/null 2>&1; then
+if git remote get-url update >/dev/null 2>&1; then
     git remote remove update
 fi
 
@@ -22,7 +22,7 @@ git fetch update
 git branch -D $CI_COMMIT_REF_NAME || echo "branch did not exist"
 git switch -c $CI_COMMIT_REF_NAME update/$CI_COMMIT_REF_NAME
 
-if [[ -n $(git status --short >/dev/null) ]]; then
+if [[ -n $(git status --short 2>/dev/null) ]]; then
 	git commit -am "${COMMIT_MESSAGE}"
 	if ! git push --set-upstream update $CI_COMMIT_REF_NAME; then
 		git pull --rebase 
