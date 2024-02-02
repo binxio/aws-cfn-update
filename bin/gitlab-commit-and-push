@@ -23,6 +23,7 @@ git branch -D $CI_COMMIT_REF_NAME || echo "branch did not exist"
 git switch -c $CI_COMMIT_REF_NAME update/$CI_COMMIT_REF_NAME
 
 if [[ -n $(git status --short 2>/dev/null) ]]; then
+	git add .
 	git commit -am "${COMMIT_MESSAGE}"
 	if ! git push --set-upstream update $CI_COMMIT_REF_NAME; then
 		git pull --rebase 
