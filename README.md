@@ -5,16 +5,18 @@ a CloudFormation template. Note that formatting and comments may be lost.
 
 Commands:
 ```
-  container-image           Updates the Docker image of ECS Container Task definition
-  config-rule-inline-code   Updates the inline code of an AWS::Config::ConfigRule resource
-  latest-ami                Updates the AMI name of Custom::AMI resources
-  cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources
   remove-resource           Removes the specified CloudFormation resource
   add-new-resources         Add new resources that exist in the new template
+  container-image           Updates the Docker image of ECS Container Task definition
+  latest-ami                Updates the AMI name of Custom::AMI resources
+  lambda-s3-key             Updates the S3Key entry of a Lambda Function definition
   lambda-inline-code        Updates the inline code of an Lambda
+  config-rule-inline-code   Updates the inline code of an AWS::Config::ConfigRule resource
   rest-api-body             Updates the body of a REST API Resource
   state-machine-definition  Updates the definition of an AWS::StepFunctions::StateMachine
   oidc-provider-thumbprints Updates the thumbprints of AWS::IAM::OIDCProviders
+  cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources
+
 ```
 
 # remove-resource - removes the specified resource and all referencing resources
@@ -305,9 +307,10 @@ into:
         Function: cfn-listener-rule-provider
 ```
 
-# lambda-s3-key - ypdates the S3Key entry of a Lambda Function definition
+# lambda-s3-key - updates the S3Key entry of a Lambda Function definition
 
-Updates the S3Key entry of a Lambda Function definition. For example:
+Updates the S3Key entry of a Lambda Function definition. The s3 key must be
+a semver key name in the format <prefix><semver>.zip: For example:
 
 ```shell
 aws-cfn-update lambda-s3-key --s3-key lambdas/iam-sudo-0.3.1.zip
