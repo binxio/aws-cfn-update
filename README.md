@@ -5,17 +5,22 @@ a CloudFormation template. Note that formatting and comments may be lost.
 
 Commands:
 ```
-  remove-resource           Removes the specified CloudFormation resource
-  add-new-resources         Add new resources that exist in the new template
-  container-image           Updates the Docker image of ECS Container Task definition
-  latest-ami                Updates the AMI name of Custom::AMI resources
-  lambda-s3-key             Updates the S3Key entry of a Lambda Function definition
-  lambda-inline-code        Updates the inline code of an Lambda
-  config-rule-inline-code   Updates the inline code of an AWS::Config::ConfigRule resource
-  rest-api-body             Updates the body of a REST API Resource
-  state-machine-definition  Updates the definition of an AWS::StepFunctions::StateMachine
-  oidc-provider-thumbprints Updates the thumbprints of AWS::IAM::OIDCProviders
-  cron-schedule-expression  Updates the schedule expression of an AWS::Events::Rules resources
+  add-new-resources          Add resources that exist in the new template and not in the existing template.
+  remove-resource            Removes the specified CloudFormation resource and all resources that reference it.
+
+  container-image            Updates the Docker image of ECS Container Definitions.
+
+  lambda-inline-code         Updates the inline code of an AWS::Lambda::Function resource.
+  config-rule-inline-code    Updates the inline code of an AWS::Config::ConfigRule resource.
+  rest-api-body              Updates the body of a REST API Resource, with an standard Open API specification merged with AWS API Gateway extensions.
+  state-machine-definition   Updates the definition of an AWS::StepFunctions::StateMachine.
+  lambda-s3-key              Updates the S3Key entry of a Lambda Function definition.
+
+  cron-schedule-expression   Updates the schedule expression of an AWS::Events::Rules resources to reflect the scheduled time in UTC.
+  oidc-provider-thumbprints  Updates the thumbprints list of an AWS::IAM::OIDCProvider.
+
+  latest-ami                 Updates the AMI name of Custom::AMI resources to the latest version.
+  packer-latest-ami          Updates a packer.json source_ami_filter to the latest AMI version.
 
 ```
 
