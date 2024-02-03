@@ -20,7 +20,7 @@ from .cfn_updater import CfnUpdater, read_template
 
 class AddNewResources(CfnUpdater):
     """
-    add resources that exist in the new template and not in the existing template
+    Add resources that exist in the new template and not in the existing template.
     """
 
     def __init__(self):

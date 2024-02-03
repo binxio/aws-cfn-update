@@ -14,6 +14,7 @@
 #   Copyright 2018 binx.io B.V.
 import os
 import re
+import shutil
 from copy import copy
 from datetime import datetime
 from aws_cfn_update.packer_ami_updater import main as packer_latest_ami
@@ -235,7 +236,7 @@ cli.add_command(update_oidc_provider_thumbprint)
 
 
 def main():
-    cli()
+    cli(max_content_width=(shutil.get_terminal_size().columns - 4))
 
 
 if __name__ == "__main__":

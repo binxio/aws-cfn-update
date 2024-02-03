@@ -25,7 +25,9 @@ _s3_key_semver_pattern = re.compile(
 
 class LambdaS3KeyUpdater(CfnUpdater):
     """
-        Updates the S3Key entry of a Lambda Function definition
+        Updates the S3Key entry of a Lambda Function definition. The s3 key should
+        match the pattern <prefix><semver>.zip.
+
     \b
       ELBListenerRuleProvider:
         Type: AWS::Lambda::Function
