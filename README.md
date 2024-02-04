@@ -4,6 +4,7 @@ Programmatically update CloudFormation templates. It will update both .yaml and 
 a CloudFormation template. Note that formatting and comments may be lost.
 
 Commands:
+
 ```
   add-new-resources          Add resources that exist in the new template and not in the existing template.
   remove-resource            Removes the specified CloudFormation resource and all resources that reference it.

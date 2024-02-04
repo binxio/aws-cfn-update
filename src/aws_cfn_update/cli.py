@@ -15,6 +15,7 @@
 import os
 import re
 import shutil
+import sys
 from copy import copy
 from datetime import datetime
 from aws_cfn_update.packer_ami_updater import main as packer_latest_ami
@@ -236,7 +237,8 @@ cli.add_command(update_oidc_provider_thumbprint)
 
 
 def main():
-    cli(max_content_width=(shutil.get_terminal_size().columns - 4))
+    width = shutil.get_terminal_size().columns if sys.stdout.isatty() else 255
+    cli(terminal_width=width, max_content_width=width-5)
 
 
 if __name__ == "__main__":
