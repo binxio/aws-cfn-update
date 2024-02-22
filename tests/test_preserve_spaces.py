@@ -59,3 +59,48 @@ def test_preserved_tagged_array():
     output = result.getvalue()
 
     assert output == input
+
+
+def test_preserved_nested_tagged_array():
+    input = textwrap.dedent(
+    """\
+    ---
+    Resources:
+      KongRouteCors:
+        Type: Custom::KongPlugin
+        Properties:
+          Plugin:
+            name: cors
+            route:
+              id: !GetAtt 'KongRoute.id'
+            protocols:
+              - http
+              - https
+            config:
+              origins:
+                - !Sub 'https://${ExternalDomainName}'
+                - !If
+                  - IsDevEnv
+                  - http://localhost:3000
+                  - !Ref 'AWS::NoValue'
+                - !If
+                  - IsDevEnv
+                  - !Sub
+                    - 'https://${PortalExternalDomainName}'
+                    - PortalExternalDomainName: pipodeclown.nl
+                  - !Ref 'AWS::NoValue'
+              methods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - PATCH
+                - OPTIONS
+      """)
+    yaml = CfnUpdater().yaml
+
+    template = yaml.load(input)
+    result = StringIO()
+    yaml.dump(template, result)
+    output = result.getvalue()
+    assert output == input
