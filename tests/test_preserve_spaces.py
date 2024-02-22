@@ -61,7 +61,10 @@ def test_preserved_tagged_array():
     assert output == input
 
 
-def test_preserved_nested_tagged_array():
+def test_nested_tagged_sequence_indentation():
+    """
+    test whether the indent of nested sequences is 4 spaces instead of 2. This is a quirk of Ruamel yaml.
+    """
     input = textwrap.dedent(
     """\
     ---
@@ -81,15 +84,15 @@ def test_preserved_nested_tagged_array():
               origins:
                 - !Sub 'https://${ExternalDomainName}'
                 - !If
-                  - IsDevEnv
-                  - http://localhost:3000
-                  - !Ref 'AWS::NoValue'
+                    - IsDevEnv
+                    - http://localhost:3000
+                    - !Ref 'AWS::NoValue'
                 - !If
-                  - IsDevEnv
-                  - !Sub
-                    - 'https://${PortalExternalDomainName}'
-                    - PortalExternalDomainName: pipodeclown.nl
-                  - !Ref 'AWS::NoValue'
+                    - IsDevEnv
+                    - !Sub
+                        - 'https://${PortalExternalDomainName}'
+                        - PortalExternalDomainName: pipodeclown.nl
+                    - !Ref 'AWS::NoValue'
               methods:
                 - GET
                 - PUT

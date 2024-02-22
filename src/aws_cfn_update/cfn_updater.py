@@ -17,7 +17,6 @@ import sys
 import os.path
 import json
 import collections
-from typing import Any, TextIO
 
 from ruamel.yaml import YAML
 
@@ -49,21 +48,12 @@ class CfnUpdater(object):
         self.dry_run = False
         self.verbose = False
         self._filename = None
-        self.yaml = CustomYAML(typ="rt")
+        self.yaml = YAML(typ="rt")
         self.yaml.preserve_quotes = True
         self.yaml.explicit_start = True
         self.yaml.width = 4096
         self.yaml.indent(mapping=2, sequence=4, offset=2)
 
-    def override_yaml_dump(self):
-        self._original_yaml_dump = self.yaml.dump
-
-        def _dump_with_transform(self, data, stream=None, **kw):
-            if "transform" not in kw:
-                kw["transform"] = _sequence_indent_two
-            return self._orig_dump(data, stream, **kw)
-
-        ruamel.yaml.YAML.dump = _dump_with_transform
 
     @property
     def filename(self):
@@ -168,83 +158,3 @@ class CfnUpdater(object):
         else:
             sys.stderr.write("ERROR: {} is not a file or directory\n".format(path))
             sys.exit(1)
-
-
-def read_template(filename: str) -> dict:
-    src = CfnUpdater()
-    src.filename = filename
-    src.load()
-    return src.template
-
-
-def _standardize_multi_sequence_indent(line: str) -> str:
-    """
-    >>> _standardize_multi_sequence_indent("    -    -    - a  ")
-    '    - - - a  '
-    """
-    offset = 0
-    dashes = 0
-    preamble = 0
-    while offset < len(line) and line[offset] == " ":
-        offset += 1
-        preamble += 1
-
-    while offset < len(line) and line[offset] in [" ", "-"]:
-        if line[offset] == "-":
-            dashes += 1
-        offset += 1
-
-    if not offset:
-        return line
-
-    return " " * preamble + "- " * dashes + line[offset:]
-
-
-def _sequence_indent_two(s):
-    """
-    indent nested sequences to multiples of 2 spaces. ruamel.yaml with the identing (2,4,2)
-    indents only the first sequence with two spaces, nested sequences are indented with 4 spaces.
-
-    # >>> _sequence_indent_two('- a\\n- b\\n- c\\n')
-    # '- a\\n- b\\n- c\\n'
-    # >>> _sequence_indent_two('- a\\n  - b\\n  - c\\n')
-    # '- a\\n  - b\\n  - c\\n'
-    >>> _sequence_indent_two('- a\\n    - b\\n    - c\\n')
-    '- a\\n  - b\\n  - c\\n'
-
-    # >>> _sequence_indent_two('- a\\n    - b\\n        - A\\n        - B\\n')
-    # '- a\\n  - b\\n    - A\\n    - B\\n'
-    # >>> _sequence_indent_two('- a\\n    - b\\n    -    - A\\n        - B\\n        - C\\n')
-    # '- a\\n  - b\\n  - - A\\n      - B\\n      - C\\n'
-    # >>> _sequence_indent_two('-    -     - a\\n           - b\\n           - c\\n           - d\\n     -     - c\\n           - d\\n           - c\\n')
-    # '- - - a\\n    - b\\n    - c\\n    - d\\n  - - c\\n    - d\\n    - c\\n'
-    """
-    result = []
-    first_indent = -1
-    for line in s.splitlines(keepends=True):
-        if line.strip():
-            indent_level = len(line) - len(line.lstrip())
-            if line[indent_level] == '-' and not line.startswith('---'):
-                line = _standardize_multi_sequence_indent(line)
-                if first_indent == -1:
-                    first_indent = indent_level
-                extra_indent = indent_level - first_indent
-                if extra_indent > 2:
-                    line = " " * (first_indent + int(extra_indent/4)*2) + line.lstrip()
-            else:
-                first_indent = -1
-
-        result.append(line)
-
-    return "".join(result)
-
-
-class CustomYAML(YAML):
-    """
-    overrides to dump method to correct indentation of nested sequences to multiples of 2 spaces.
-    """
-
-    def dump(self, data, stream=None, **kw):
-        if "transform" not in kw:
-            kw["transform"] = _sequence_indent_two
-        return super().dump(data, stream, **kw)
