@@ -222,16 +222,17 @@ def _sequence_indent_two(s):
     result = []
     first_indent = -1
     for line in s.splitlines(keepends=True):
-        indent_level = len(line) - len(line.lstrip())
-        if indent_level < len(line) and line[indent_level] == '-' and not line.startswith('---'):
-            line = _standardize_multi_sequence_indent(line)
-            if first_indent == -1:
-                first_indent = indent_level
-            extra_indent = indent_level - first_indent
-            if extra_indent > 2:
-                line = " " * (first_indent + int(extra_indent/4)*2) + line.lstrip()
-        else:
-            first_indent = -1
+        if line.strip():
+            indent_level = len(line) - len(line.lstrip())
+            if line[indent_level] == '-' and not line.startswith('---'):
+                line = _standardize_multi_sequence_indent(line)
+                if first_indent == -1:
+                    first_indent = indent_level
+                extra_indent = indent_level - first_indent
+                if extra_indent > 2:
+                    line = " " * (first_indent + int(extra_indent/4)*2) + line.lstrip()
+            else:
+                first_indent = -1
 
         result.append(line)
 
