@@ -68,6 +68,7 @@ def test_preserved_nested_tagged_array():
     Resources:
       KongRouteCors:
         Type: Custom::KongPlugin
+
         Properties:
           Plugin:
             name: cors

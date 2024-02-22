@@ -177,10 +177,10 @@ def read_template(filename: str) -> dict:
     return src.template
 
 
-def _standardize_multi_sequence_indent(line: str) -> (str, int):
+def _standardize_multi_sequence_indent(line: str) -> str:
     """
     >>> _standardize_multi_sequence_indent("    -    -    - a  ")
-    ('    - - - a  ', 3)
+    '    - - - a  '
     """
     offset = 0
     dashes = 0
@@ -195,14 +195,15 @@ def _standardize_multi_sequence_indent(line: str) -> (str, int):
         offset += 1
 
     if not offset:
-        return line, 0
+        return line
 
-    return " " * preamble + "- " * dashes + line[offset:], dashes
+    return " " * preamble + "- " * dashes + line[offset:]
 
 
 def _sequence_indent_two(s):
     """
-    correct indentation of nested sequences to multiples of 2 spaces.
+    indent nested sequences to multiples of 2 spaces. ruamel.yaml with the identing (2,4,2)
+    indents only the first sequence with two spaces, nested sequences are indented with 4 spaces.
 
     # >>> _sequence_indent_two('- a\\n- b\\n- c\\n')
     # '- a\\n- b\\n- c\\n'
@@ -219,23 +220,18 @@ def _sequence_indent_two(s):
     # '- - - a\\n    - b\\n    - c\\n    - d\\n  - - c\\n    - d\\n    - c\\n'
     """
     result = []
-    indent = []
+    first_indent = -1
     for line in s.splitlines(keepends=True):
         indent_level = len(line) - len(line.lstrip())
-        if line[indent_level] == '-' and not line.startswith('---'):
-            if not indent or indent[-1] < indent_level:
-                indent.append(indent_level)
-            elif indent[-1] > indent_level:
-                indent[-1] = indent_level
-            else:
-                pass                   # same indent_level
-
-            line, dashes = _standardize_multi_sequence_indent(line)
-            extra_indent = indent_level - indent[0]
+        if indent_level < len(line) and line[indent_level] == '-' and not line.startswith('---'):
+            line = _standardize_multi_sequence_indent(line)
+            if first_indent == -1:
+                first_indent = indent_level
+            extra_indent = indent_level - first_indent
             if extra_indent > 2:
-                line = " " * (indent[0] + int(extra_indent/4)*2) + line.lstrip()
+                line = " " * (first_indent + int(extra_indent/4)*2) + line.lstrip()
         else:
-            indent = []
+            first_indent = -1
 
         result.append(line)
 
