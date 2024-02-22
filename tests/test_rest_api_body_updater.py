@@ -1,5 +1,7 @@
-from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 import json
+import os
+
+from aws_cfn_update.rest_api_body_updater import RestAPIBodyUpdater
 
 
 def test_new_resource_name():
@@ -165,11 +167,12 @@ def test_add_new_version_keep_two():
 
 
 def test_load_and_merge():
+    test_directory = os.path.dirname(os.path.abspath(__file__))
     updater = RestAPIBodyUpdater()
     updater.resource_name = "RestAPI"
     updater.template = json.loads(json.dumps(sample))
-    updater.api_gateway_extensions = "tests/aws-extensions.yaml"
-    updater.open_api_specification = "tests/api-specification.yaml"
+    updater.api_gateway_extensions = f"{test_directory}/aws-extensions.yaml"
+    updater.open_api_specification = f"{test_directory}/api-specification.yaml"
     updater.body = updater.load_and_merge_swagger_body()
     updater.update_template()
 
