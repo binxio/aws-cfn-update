@@ -158,3 +158,10 @@ class CfnUpdater(object):
         else:
             sys.stderr.write("ERROR: {} is not a file or directory\n".format(path))
             sys.exit(1)
+
+def read_template(filename: str) -> dict:
+    src = CfnUpdater()
+    src.filename = filename
+    src.load()
+    return src.template
+
