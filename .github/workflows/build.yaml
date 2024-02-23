@@ -1,12 +1,9 @@
 ---
-name: release-to-pypi
-"on":
-  push:
-    tags:
-      - '*'
+name: build
+"on": push
 jobs:
   build:
-    name: release
+    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,8 +16,3 @@ jobs:
         run: pip install pipenv
       - name: run tests
         run: make test
-      - name: release
-        run: make snapshot
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
