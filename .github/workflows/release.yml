@@ -17,6 +17,8 @@ jobs:
         run: git fetch --prune --unshallow
       - name: install environment
         run: pip install pipenv
+      - name: run tests
+        run: make test
       - name: release
         run: make snapshot
         env:
