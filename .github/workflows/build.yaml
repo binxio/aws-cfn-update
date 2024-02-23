@@ -1,0 +1,18 @@
+---
+name: build
+"on": push
+jobs:
+  build:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: checkout
+        run: git fetch --prune --unshallow
+      - name: install environment
+        run: pip install pipenv
+      - name: run tests
+        run: make test
