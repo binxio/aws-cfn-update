@@ -12,6 +12,7 @@ class TestAMIUpdater(TestCase):
         )
         self.session.set_credentials(self, "deadbeef", "deadbeef")
         boto3.setup_default_session(botocore_session=self.session)
+        assert boto3.DEFAULT_SESSION
 
     def tearDown(self) -> None:
         boto3.DEFAULT_SESSION = None
