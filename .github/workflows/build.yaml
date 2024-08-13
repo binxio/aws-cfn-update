@@ -5,14 +5,17 @@ jobs:
   build:
     name: test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python }}
       - name: checkout
         run: git fetch --prune --unshallow
       - name: install environment
-        run: pip install pipenv
+        run: pip install tox
       - name: run tests
-        run: make test
+        run: tox -e py
