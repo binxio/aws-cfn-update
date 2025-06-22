@@ -9,10 +9,10 @@ jobs:
     name: release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: '3.12'
       - name: checkout
         run: git fetch --prune --unshallow
       - name: install environment
