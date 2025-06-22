@@ -91,7 +91,8 @@ class ContainerImageUpdater(CfnUpdater):
             task = resources[task_name]
             containers = task.get("Properties", {}).get("ContainerDefinitions", [])
             for container in filter(
-                lambda c: self.get_new_image_reference(c["Image"]), containers
+                lambda c: self.get_new_image_reference(c["Image"]),
+                    filter(lambda c: isinstance(c.get("Image",None), str), containers)
             ):
                 new_image = self.get_new_image_reference(container["Image"])
                 if container["Image"] != new_image:

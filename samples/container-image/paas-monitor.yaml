@@ -13,3 +13,5 @@ Resources:
       ContainerDefinitions:
         - Name: paas-monitor
           Image: mvanholsteijn/paas-monitor:latest
+        - Name: paas-monitor-reference
+          Image: !Ref PaasMonitorImage

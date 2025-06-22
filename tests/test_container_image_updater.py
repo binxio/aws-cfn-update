@@ -1,3 +1,5 @@
+import textwrap
+
 from aws_cfn_update.container_image_updater import ContainerImageUpdater as Updater
 from copy import deepcopy
 
@@ -79,3 +81,36 @@ def test_invalid_container_image():
         ]
     except ValueError as error:
         assert error.args == ("alpine is an invalid image name",)
+
+def test_container_image_reference_not_found():
+    template = textwrap.dedent("""
+        AWSTemplateFormatVersion: '2010-09-09'
+        Parameters:
+          PaasMonitorImage: String
+        
+        Resources:
+          AMI:
+            Type: Custom::AMI
+            Properties:
+              Filters:
+                name: amzn-ami-2017.09.a-amazon-ecs-optimized
+          TaskDefinition:
+            Type: AWS::ECS::TaskDefinition
+            Properties:
+              Family: testme
+              NetworkMode: bridge
+              ContainerDefinitions:
+                - Name: paas-monitor
+                  Image: !Ref PaasMonitorImage
+
+    """)
+    new_images = ["mvanholsteijn/paas-monitor:0.6.0"]
+
+    updater = Updater()
+    updater.filename = "test.yaml"
+    updater.images = new_images
+    updater.template = updater.yaml.load(template)
+
+    updater.update_template()
+    assert not updater.dirty
+
