@@ -41,9 +41,9 @@ def test_single_update():
     updater.update_template()
     assert updater.dirty
     for image in new_images:
-        new_value = (updater.template["Resources"]["TaskDefinition"]["Properties"][
+        new_value = updater.template["Resources"]["TaskDefinition"]["Properties"][
             "ContainerDefinitions"
-        ][0]["Image"])
+        ][0]["Image"]
         assert image == new_value
 
 
@@ -82,8 +82,10 @@ def test_invalid_container_image():
     except ValueError as error:
         assert error.args == ("alpine is an invalid image name",)
 
+
 def test_container_image_reference_not_found():
-    template = textwrap.dedent("""
+    template = textwrap.dedent(
+        """
         AWSTemplateFormatVersion: '2010-09-09'
         Parameters:
           PaasMonitorImage: String
@@ -103,7 +105,8 @@ def test_container_image_reference_not_found():
                 - Name: paas-monitor
                   Image: !Ref PaasMonitorImage
 
-    """)
+    """
+    )
     new_images = ["mvanholsteijn/paas-monitor:0.6.0"]
 
     updater = Updater()
@@ -113,4 +116,3 @@ def test_container_image_reference_not_found():
 
     updater.update_template()
     assert not updater.dirty
-

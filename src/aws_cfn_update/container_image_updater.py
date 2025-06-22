@@ -52,7 +52,6 @@ class ContainerImageUpdater(CfnUpdater):
         super(ContainerImageUpdater, self).__init__()
         self._images = {}
 
-
     @property
     def images(self) -> [str]:
         return self._images.values()
@@ -61,16 +60,16 @@ class ContainerImageUpdater(CfnUpdater):
     def images(self, images: [str]):
         self._images = {}
         for image in images:
-            parts = image.split(':')
+            parts = image.split(":")
             if len(parts) != 2:
-                raise ValueError(f'{image} is an invalid image name')
+                raise ValueError(f"{image} is an invalid image name")
             base = parts[0]
             if base in self._images and image != self._images[base]:
-                raise ValueError(f'image already defined for {base}')
+                raise ValueError(f"image already defined for {base}")
             self._images[base] = image
 
     def get_new_image_reference(self, image: str) -> Optional[str]:
-        return self._images.get(image.split(':')[0])
+        return self._images.get(image.split(":")[0])
 
     @staticmethod
     def is_task_definition(resource):
@@ -92,7 +91,7 @@ class ContainerImageUpdater(CfnUpdater):
             containers = task.get("Properties", {}).get("ContainerDefinitions", [])
             for container in filter(
                 lambda c: self.get_new_image_reference(c["Image"]),
-                    filter(lambda c: isinstance(c.get("Image",None), str), containers)
+                filter(lambda c: isinstance(c.get("Image", None), str), containers),
             ):
                 new_image = self.get_new_image_reference(container["Image"])
                 if container["Image"] != new_image:
@@ -104,7 +103,7 @@ class ContainerImageUpdater(CfnUpdater):
                     container["Image"] = new_image
                     self.dirty = True
 
-    def main(self, image:[str], dry_run:bool, verbose:bool, paths:[str]):
+    def main(self, image: [str], dry_run: bool, verbose: bool, paths: [str]):
         self.images = image
         self.dry_run = dry_run
         self.verbose = verbose

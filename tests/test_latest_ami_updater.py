@@ -4,7 +4,6 @@ from aws_cfn_update.latest_ami_updater import AMIUpdater, make_new_resource_name
 
 
 def test_new_resource_name():
-
     updater = stubbed_ami_updater()
     result = make_new_resource_name("WhatEverBaseAMI")
     assert result == "WhatEverBaseAMIv1"

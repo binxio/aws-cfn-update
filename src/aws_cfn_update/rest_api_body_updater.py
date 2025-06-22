@@ -136,7 +136,6 @@ class RestAPIBodyUpdater(CfnUpdater):
             self.yaml_dump_to_str(current_body) if current_body else ""
         )
         if self.body_as_string != current_body_as_string:
-
             if self.verbose:
                 for text in difflib.unified_diff(
                     current_body_as_string.split("\n"), self.body_as_string.split("\n")

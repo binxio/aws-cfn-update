@@ -4,7 +4,6 @@ from aws_cfn_update.config_rule_inline_code_updater import (
 import json
 
 
-
 sample = {
     "Resources": {
         "ConfigRule": {
@@ -14,13 +13,14 @@ sample = {
                     "Owner": "CUSTOM_POLICY",
                     "CustomPolicyDetails": {
                         "EnableDebugLogDelivery": "true",
-                        "PolicyRuntime": "guard-2.x.x"
-                    }
+                        "PolicyRuntime": "guard-2.x.x",
+                    },
                 }
-            }
+            },
         }
     }
 }
+
 
 def test_add_body():
     updater = Updater()
@@ -34,25 +34,26 @@ def test_add_body():
 
     assert "Source" in updater.template["Resources"]["ConfigRule"]["Properties"]
     source = updater.template["Resources"]["ConfigRule"]["Properties"]["Source"]
-    assert (
-        "CustomPolicyDetails"
-        in source
-    )
+    assert "CustomPolicyDetails" in source
 
-    assert ("CUSTOM_POLICY" == source["Owner"])
-    assert ("true" == source["CustomPolicyDetails"]["EnableDebugLogDelivery"])
-    assert ("guard-2.x.x" in source["CustomPolicyDetails"]["PolicyRuntime"])
+    assert "CUSTOM_POLICY" == source["Owner"]
+    assert "true" == source["CustomPolicyDetails"]["EnableDebugLogDelivery"]
+    assert "guard-2.x.x" in source["CustomPolicyDetails"]["PolicyRuntime"]
 
     assert (
-        source["CustomPolicyDetails"]["PolicyText"] == 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
+        source["CustomPolicyDetails"]["PolicyText"]
+        == 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
     )
+
 
 def test_replace_body():
     updater = Updater()
     updater.resource_name = "ConfigRule"
     updater.code = 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
     updater.template = sample.copy()
-    updater.template["Resources"]["ConfigRule"]["Properties"]["Source"]["CustomPolicyDetails"]["PolicyText"] = "Existing Policy"
+    updater.template["Resources"]["ConfigRule"]["Properties"]["Source"][
+        "CustomPolicyDetails"
+    ]["PolicyText"] = "Existing Policy"
 
     updater.update_template()
     assert updater.dirty
@@ -60,17 +61,15 @@ def test_replace_body():
 
     assert "Source" in updater.template["Resources"]["ConfigRule"]["Properties"]
     source = updater.template["Resources"]["ConfigRule"]["Properties"]["Source"]
-    assert (
-        "CustomPolicyDetails"
-        in source
-    )
+    assert "CustomPolicyDetails" in source
 
-    assert ("CUSTOM_POLICY" == source["Owner"])
-    assert ("true" == source["CustomPolicyDetails"]["EnableDebugLogDelivery"])
-    assert ("guard-2.x.x" in source["CustomPolicyDetails"]["PolicyRuntime"])
+    assert "CUSTOM_POLICY" == source["Owner"]
+    assert "true" == source["CustomPolicyDetails"]["EnableDebugLogDelivery"]
+    assert "guard-2.x.x" in source["CustomPolicyDetails"]["PolicyRuntime"]
 
     assert (
-        source["CustomPolicyDetails"]["PolicyText"] == 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
+        source["CustomPolicyDetails"]["PolicyText"]
+        == 'let buckets = Resources.*[ Type == "AWS::S3::Bucket" ]'
     )
 
 

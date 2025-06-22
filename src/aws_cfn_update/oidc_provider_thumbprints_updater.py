@@ -120,7 +120,6 @@ class OIDCProviderThumbprintsUpdater(CfnUpdater):
                 conn.close()
 
     def update_thumbprints(self, name, provider):
-
         url = provider.get("Properties", {}).get("Url")
         public_key = self.get_public_key(url)
         sha1 = public_key.fingerprint(hashes.SHA1())

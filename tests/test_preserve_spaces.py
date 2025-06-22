@@ -31,7 +31,8 @@ def test_preserve_indent():
             - A
             - B
             - C
-        """)
+        """
+    )
 
     template = yaml.load(input)
     result = StringIO()
@@ -39,6 +40,7 @@ def test_preserve_indent():
     output = result.getvalue()
 
     assert output == input
+
 
 def test_preserved_tagged_array():
     yaml = CfnUpdater().yaml
@@ -51,7 +53,8 @@ def test_preserved_tagged_array():
             - '${B}-{A}'
             - B: Hello
               C: World
-        """)
+        """
+    )
 
     template = yaml.load(input)
     result = StringIO()
@@ -66,7 +69,7 @@ def test_nested_tagged_sequence_indentation():
     test whether the indent of nested sequences is 4 spaces instead of 2. This is a quirk of Ruamel yaml.
     """
     input = textwrap.dedent(
-    """\
+        """\
     ---
     Resources:
       KongRouteCors:
@@ -100,7 +103,8 @@ def test_nested_tagged_sequence_indentation():
                 - DELETE
                 - PATCH
                 - OPTIONS
-      """)
+      """
+    )
     yaml = CfnUpdater().yaml
 
     template = yaml.load(input)

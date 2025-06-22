@@ -4,11 +4,11 @@ import botocore
 from aws_cfn_update.packer_ami_updater import PackerAMIUpdater
 from unittest import TestCase
 
+
 class TestAMIUpdater(TestCase):
     def setUp(self):
         self.session = botocore.session.get_session(
-            {"region": ('region', 'AWS_DEFAULT_REGION','eu-central-1', None)}
-
+            {"region": ("region", "AWS_DEFAULT_REGION", "eu-central-1", None)}
         )
         self.session.set_credentials(self, "deadbeef", "deadbeef")
         boto3.setup_default_session(botocore_session=self.session)
@@ -27,7 +27,6 @@ class TestAMIUpdater(TestCase):
         source_ami_filter = {"filters": {"blabla": "Windows_Server 2016 2020.02.10"}}
         assert not updater.is_source_filter_name_match(source_ami_filter)
         assert not updater.is_source_filter_name_match({})
-
 
     def test_create_describe_image_request(self):
         source_ami_filter = {

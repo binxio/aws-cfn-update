@@ -54,7 +54,6 @@ class CfnUpdater(object):
         self.yaml.width = 4096
         self.yaml.indent(mapping=2, sequence=4, offset=2)
 
-
     @property
     def filename(self):
         """
@@ -159,9 +158,9 @@ class CfnUpdater(object):
             sys.stderr.write("ERROR: {} is not a file or directory\n".format(path))
             sys.exit(1)
 
+
 def read_template(filename: str) -> dict:
     src = CfnUpdater()
     src.filename = filename
     src.load()
     return src.template
-

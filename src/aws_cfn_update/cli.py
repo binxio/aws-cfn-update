@@ -39,6 +39,7 @@ from aws_cfn_update.oidc_provider_thumbprints_updater import (
     update_oidc_provider_thumbprint,
 )
 
+
 @click.group()
 @click.option(
     "--dry-run",
@@ -63,7 +64,14 @@ def validate_image(ctx, param, value):
 
 
 @cli.command(name="container-image", help=ContainerImageUpdater.__doc__)
-@click.option("--image", required=False, multiple=True, default=[], callback=validate_image, help="to update to")
+@click.option(
+    "--image",
+    required=False,
+    multiple=True,
+    default=[],
+    callback=validate_image,
+    help="to update to",
+)
 @click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def task_image(ctx, image, path):
@@ -198,8 +206,15 @@ def lambda_body(ctx, resource, file, path):
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
 
+
 @cli.command(name="lambda-s3-key", help=LambdaS3KeyUpdater.__doc__)
-@click.option("--s3-key", required=False, multiple=True, default=[], help="The new S3 key in semver format")
+@click.option(
+    "--s3-key",
+    required=False,
+    multiple=True,
+    default=[],
+    help="The new S3 key in semver format",
+)
 @click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
 def update_s3_key(ctx, s3_key, path):
@@ -210,7 +225,6 @@ def update_s3_key(ctx, s3_key, path):
     if not s3_key:
         click.echo("no Lambda s3 keys to update")
         return
-
 
     updater.main(s3_key, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
 
@@ -229,6 +243,7 @@ def config_rule_body(ctx, resource, file, path):
         body = f.read()
     updater.main(resource, body, list(path), ctx.obj["dry_run"], ctx.obj["verbose"])
 
+
 cli.add_command(update_state_machine_definition)
 cli.add_command(remove_resource)
 cli.add_command(add_new_resources)
@@ -238,7 +253,7 @@ cli.add_command(update_oidc_provider_thumbprint)
 
 def main():
     width = shutil.get_terminal_size().columns if sys.stdout.isatty() else 255
-    cli(terminal_width=width, max_content_width=width-5)
+    cli(terminal_width=width, max_content_width=width - 5)
 
 
 if __name__ == "__main__":
