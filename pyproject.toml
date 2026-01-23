@@ -2,4 +2,3 @@
 requires = ["setuptools_scm", "setuptools_rust", "tox", "build", "twine"]
 build-backend = "setuptools.build_meta"
 
-
