@@ -198,7 +198,7 @@ def correct_cron_expression_for_utc(expression, today):
         next_time = croniter(expression, tomorrow_midnight).get_next(datetime)
     except ValueError as e:
         sys.stderr.write("ERROR: {}".format(e))
-        sys.exit(1)
+        raise SystemExit(1)
 
     utcoffset = next_time.tzinfo.utcoffset(next_time)
     if utcoffset.seconds % 3600 == 0:

@@ -18,6 +18,8 @@
           <option value="certifi" />
           <option value="charset-normalizer" />
           <option value="requests" />
+          <option value="idna" />
+          <option value="urllib3" />
         </list>
       </option>
     </inspection_tool>

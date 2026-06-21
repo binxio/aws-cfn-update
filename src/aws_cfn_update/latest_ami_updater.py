@@ -310,6 +310,6 @@ class AMIUpdater(CfnUpdater):
                     self.ami_name_pattern
                 )
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
         self.update(path)

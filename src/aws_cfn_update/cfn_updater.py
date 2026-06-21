@@ -156,7 +156,7 @@ class CfnUpdater(object):
                     self.update(os.path.join(root, f))
         else:
             sys.stderr.write("ERROR: {} is not a file or directory\n".format(path))
-            sys.exit(1)
+            raise SystemExit(1)
 
 
 def read_template(filename: str) -> dict:
