@@ -12,5 +12,14 @@
         </value>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="certifi" />
+          <option value="charset-normalizer" />
+          <option value="requests" />
+        </list>
+      </option>
+    </inspection_tool>
   </profile>
 </component>

@@ -250,6 +250,28 @@ def test_add_new_versions_keep_old_refs():
     assert template["Outputs"]["OldAMI"]["Ref"] == "CustomAMIv1"
     assert template["Outputs"]["NewAMI"]["Ref"] == "CustomAMIv3"
 
+def test_with_specified_version():
+    template = {
+        "Resources": {
+            "CustomAMI": {
+                "Type": "Custom::AMI",
+                "Properties": {
+                    "Filters": {"name": "amzn-ami-2013.09.b-amazon-ecs-optimized"}
+                }
+            }
+        }
+    }
+    updater = stubbed_ami_updater()
+    updater.template = template
+    updater.ami_name_pattern = "amzn-ami-*ecs-optimized"
+    updater.ami_name = "amzn-ami-2017.09.i-amazon-ecs-optimized"
+    updater.add_new_version = False
+    updater.update_template()
+    assert updater.dirty
+    assert "CustomAMI" in template["Resources"]
+    assert template["Resources"]["CustomAMI"]["Properties"]["Filters"]["name"] == updater.ami_name
+
+
 
 all_responses = []
 with open(os.path.join(os.path.dirname(__file__), "dummy_responses.json"), "r") as f:

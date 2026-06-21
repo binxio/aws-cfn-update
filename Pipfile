@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 aws_cfn_update = {editable = true, path = "."}
+pytest-runner = {file = ".", editable = true}
 
 [requires]
 python_version = "3.12"

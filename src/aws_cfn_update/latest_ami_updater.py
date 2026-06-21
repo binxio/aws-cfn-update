@@ -120,12 +120,18 @@ class AMIUpdater(CfnUpdater):
              Type: AWS::EC2::Instance
              Properties:
                 ImageId: !Ref CustomAMIv3
+
+    You can also specify the AMI name to use on the command line by
+    specifying --ami-name-pattern  amzn2-ami-ecs-hvm-*-ebs-* with --ami-name
+     amzn2-ami-ecs-hvm-2.0.20241120-x86_64-ebs-1.0.140.
+
     """
 
     def __init__(self):
         super(AMIUpdater, self).__init__()
         self._ami_name_pattern = None
         self.add_new_version = False
+        self.ami_name = None
         self.latest_ami_name_pattern = None
 
     @property
@@ -141,10 +147,11 @@ class AMIUpdater(CfnUpdater):
         return resource.get("Type", "") == "Custom::AMI"
 
     def create_describe_image_request(self, ami):
-        # copy the filters values, except for name and state.
+        # copy the filter values, except for name and state.
+        name_filter = self.ami_name if self.ami_name else self.ami_name_pattern
         properties = ami.get("Properties", {})
         filters = [
-            {"Name": "name", "Values": [self.ami_name_pattern]},
+            {"Name": "name", "Values": [name_filter]},
             {"Name": "state", "Values": ["available"]},
         ]
         for k, v in properties.get("Filters", {}).items():
@@ -171,10 +178,10 @@ class AMIUpdater(CfnUpdater):
 
     def load_latest_ami_name_pattern(self, resource):
         response = self._describe_images(**self.create_describe_image_request(resource))
-
         images = sorted(response["Images"], key=lambda i: i["CreationDate"])
         self.latest_ami_name_pattern = images[-1]["Name"] if len(images) > 0 else None
-        if len(images) > 0:
+
+        if images:
             sys.stderr.write(
                 "INFO: using {} matching {}, created on {}\n".format(
                     self.latest_ami_name_pattern,
@@ -288,12 +295,15 @@ class AMIUpdater(CfnUpdater):
         else:
             self.update_inplace()
 
-    def main(self, ami_name_pattern, dry_run, verbose, add_new_version, path):
+    def main(self, ami_name_pattern, dry_run, verbose, add_new_version, ami_name, path):
         self.dry_run = dry_run
         self.verbose = verbose
         self.ami_name_pattern = ami_name_pattern
         self.add_new_version = add_new_version
-        self.load_latest_ami_name_pattern({})
+        self.ami_name = ami_name
+        if ami_name and not self.is_ami_name_pattern_match(ami_name):
+            raise ValueError(f"the specified name '{ami_name}' does not match the specified pattern '{self.ami_name_pattern}'")
+
         if self.latest_ami_name_pattern is None:
             sys.stderr.write(
                 "ERROR: image name {} does not resolve to an active AMI \n".format(

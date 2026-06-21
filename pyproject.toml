@@ -1,4 +1,51 @@
 [build-system]
-requires = ["setuptools_scm", "setuptools_rust", "tox", "build", "twine"]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "aws-cfn-update"
+dynamic = ["version"]
+authors = [
+    {name = "Mark van Holsteijn", email = "mark.vanholsteijn@xebia.com"},
+]
+description = "Programmatically update CloudFormation templates"
+readme = "README.md"
+license = {text = "BSD 3-Clause License"}
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "click",
+    "boto3",
+    "cfn-flip",
+    "pytz",
+    "croniter",
+    "tzlocal",
+    "ruamel.yaml>=0.17.0",
+    "requests",
+    "jsonmerge",
+    "cryptography",
+]
+
+[project.urls]
+Homepage = "https://github.com/binxio/aws-cfn-update"
+
+[project.scripts]
+aws-cfn-update = "aws_cfn_update.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+zip-safe = true
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
 

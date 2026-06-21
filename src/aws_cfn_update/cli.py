@@ -93,6 +93,12 @@ def task_image(ctx, image, path):
     help="glob style pattern of the AMI image name to use",
 )
 @click.option(
+    "--ami-name",
+    required=False,
+    help="the name of specified AMI image to use",
+)
+
+@click.option(
     "--add-new-version",
     is_flag=True,
     default=False,
@@ -100,13 +106,14 @@ def task_image(ctx, image, path):
 )
 @click.argument("path", nargs=-1, required=True, type=click.Path(exists=True))
 @click.pass_context
-def ami_image_update(ctx, ami_name_pattern, add_new_version, path):
+def ami_image_update(ctx, ami_name_pattern, add_new_version, ami_name, path):
     updater = AMIUpdater()
     updater.main(
         ami_name_pattern,
         ctx.obj["dry_run"],
         ctx.obj["verbose"],
         add_new_version,
+        ami_name,
         list(path),
     )
 
