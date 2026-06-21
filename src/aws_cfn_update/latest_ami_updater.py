@@ -304,6 +304,7 @@ class AMIUpdater(CfnUpdater):
         if ami_name and not self.is_ami_name_pattern_match(ami_name):
             raise ValueError(f"the specified name '{ami_name}' does not match the specified pattern '{self.ami_name_pattern}'")
 
+        self.load_latest_ami_name_pattern({})
         if self.latest_ami_name_pattern is None:
             sys.stderr.write(
                 "ERROR: image name {} does not resolve to an active AMI \n".format(
