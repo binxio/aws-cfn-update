@@ -53,11 +53,11 @@ class ContainerImageUpdater(CfnUpdater):
         self._images = {}
 
     @property
-    def images(self) -> [str]:
+    def images(self) -> list[str]:
         return self._images.values()
 
     @images.setter
-    def images(self, images: [str]):
+    def images(self, images: list[str]):
         self._images = {}
         for image in images:
             parts = image.split(":")
@@ -103,7 +103,7 @@ class ContainerImageUpdater(CfnUpdater):
                     container["Image"] = new_image
                     self.dirty = True
 
-    def main(self, image: [str], dry_run: bool, verbose: bool, paths: [str]):
+    def main(self, image: list[str], dry_run: bool, verbose: bool, paths: list[str]):
         self.images = image
         self.dry_run = dry_run
         self.verbose = verbose

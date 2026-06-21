@@ -53,14 +53,14 @@ class LambdaS3KeyUpdater(CfnUpdater):
         self._s3_keys = {}
 
     @property
-    def s3_keys(self) -> [str]:
+    def s3_keys(self) -> list[str]:
         return self._s3_keys.values()
 
     def s3_key_by_prefix(self, prefix: str) -> Optional[str]:
         return self._s3_keys.get(prefix)
 
     @s3_keys.setter
-    def s3_keys(self, s3_keys: [str]):
+    def s3_keys(self, s3_keys: list[str]):
         self._s3_keys = {}
         for s3_key in s3_keys:
             match = _s3_key_semver_pattern.match(s3_key)
@@ -92,7 +92,7 @@ class LambdaS3KeyUpdater(CfnUpdater):
                         code["S3Key"] = replacement
                         self.dirty = True
 
-    def main(self, s3_keys: [str], paths, dry_run, verbose):
+    def main(self, s3_keys: list[str], paths, dry_run, verbose):
         self.s3_keys = s3_keys
         self.dry_run = dry_run
         self.verbose = verbose
