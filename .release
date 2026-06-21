@@ -1,3 +1,2 @@
-release=0.14.1
-tag=v0.14.1
-pre_tag_command=sed -i "" -e 's/^version *=.*$/version = @@RELEASE@@/' setup.cfg pyproject.toml
+release=0.15.0
+tag=v0.15.0
