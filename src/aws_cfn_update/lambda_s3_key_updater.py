@@ -19,7 +19,7 @@ from typing import Optional
 from .cfn_updater import CfnUpdater
 
 _s3_key_semver_pattern = re.compile(
-    r"(.*)(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?\.zip$"
+    r"(.*)(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[a-z0-9A-Z-]+)?\.zip$"
 )
 
 
