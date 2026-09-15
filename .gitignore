@@ -1,9 +1,5 @@
 .pytest_cache/
 .eggs/
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/jpa-buddy.xml
-.idea/php.xml
 venv/
 *.pyc
 
@@ -18,4 +14,4 @@ dist/
 .pytest_cache/
 .mypy_cache/
 .mypy_cache
-
+.idea/
